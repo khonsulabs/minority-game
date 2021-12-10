@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["minority_game_client","minority_game_server","minority_game_shared","xtask"];

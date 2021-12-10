@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["minority_game_client"] = [{"text":"impl Behavior for <a class=\"struct\" href=\"minority_game_client/struct.GameInterface.html\" title=\"struct minority_game_client::GameInterface\">GameInterface</a>","synthetic":false,"types":["minority_game_client::GameInterface"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

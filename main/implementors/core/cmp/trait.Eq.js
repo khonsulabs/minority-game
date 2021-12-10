@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["minority_game_client"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.56.1/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"enum\" href=\"minority_game_client/enum.CounterWidgets.html\" title=\"enum minority_game_client::CounterWidgets\">CounterWidgets</a>","synthetic":false,"types":["minority_game_client::CounterWidgets"]}];
+implementors["minority_game_shared"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.56.1/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"enum\" href=\"minority_game_shared/enum.Choice.html\" title=\"enum minority_game_shared::Choice\">Choice</a>","synthetic":false,"types":["minority_game_shared::Choice"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

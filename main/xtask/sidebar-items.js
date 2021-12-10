@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Args",""]],"fn":[["build_web_app",""],["execute_wasm_bindgen",""],["main",""]],"struct":[["CodeCoverageConfig",""]]});

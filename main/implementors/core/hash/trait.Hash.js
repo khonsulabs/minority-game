@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["minority_game_client"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.56.1/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"enum\" href=\"minority_game_client/enum.CounterWidgets.html\" title=\"enum minority_game_client::CounterWidgets\">CounterWidgets</a>","synthetic":false,"types":["minority_game_client::CounterWidgets"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

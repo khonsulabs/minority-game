@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["minority_game_server"] = [{"text":"impl Schema for <a class=\"enum\" href=\"minority_game_server/schema/enum.GameSchema.html\" title=\"enum minority_game_server::schema::GameSchema\">GameSchema</a>","synthetic":false,"types":["minority_game_server::schema::GameSchema"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

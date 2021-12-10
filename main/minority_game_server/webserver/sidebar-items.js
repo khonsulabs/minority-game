@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["PKG_PATH",""],["STATIC_PATH",""]],"fn":[["spa_index",""],["upgrade_websocket",""]],"struct":[["WebServer",""]]});
