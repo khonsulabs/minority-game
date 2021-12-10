@@ -169,7 +169,7 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
     // launches the server.
     let client = loop {
         let api_callback_context = database.clone();
-        match Client::build("ws://127.0.0.1:8081".parse().unwrap())
+        match Client::build("ws://127.0.0.1:8080/ws".parse().unwrap())
             .with_custom_api_callback::<Api, _>(move |response| match response {
                 Ok(Response::Welcome {
                     happiness,

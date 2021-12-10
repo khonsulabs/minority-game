@@ -1,0 +1,14 @@
+[Unit]
+Description=Minority Game
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/authbind ./minority-game-server serve
+WorkingDirectory=/home/minority/release
+User=minority
+Group=minority
+Restart=on-failure
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target

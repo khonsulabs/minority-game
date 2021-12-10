@@ -1,0 +1,86 @@
+name: Test and Deploy
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build tests
+        run: |
+          cargo test --all-features --no-run
+
+      - name: Run unit tests
+        run: |
+          cargo test --all-features
+        env:
+          RUST_BACKTRACE: 1
+
+  package:
+    runs-on: ubuntu-latest
+    environment: Production
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install Rust
+        uses: hecrj/setup-rust-action@v1
+
+      - name: Install wasm-bindgen-cli
+        run: |
+          cargo install wasm-bindgen-cli
+
+      - name: Build web app
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo xtask build-web-app
+
+      - name: Build executable
+        run: |
+          cargo build --bin minority-game-server --release --features acme
+
+      - name: Package release
+        run: |
+          mkdir release
+          cp target/release/minority-game-server release/
+          cp -r client/pkg release/
+          cp -r client/static release/
+          tar -cvf release.tar release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: release.tar
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    timeout-minutes: 30
+    needs: [package, test]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: release
+      
+      - name: Gather artifacts 
+        run: |
+          tar -xvf release.tar
+
+      - name: Configure SSH 
+        run: |
+          mkdir ~/.ssh
+          chmod 0700 ~/.ssh
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 0600 ~/.ssh/deploy_key
+          ssh-keyscan -H minority-game.gooey.rs >> ~/.ssh/known_hosts
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          
+      - name: Deploy
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/deploy_key" release/ minority@minority-game.gooey.rs:release/
+          ssh -i ~/.ssh/deploy_key minority@minority-game.gooey.rs sudo /bin/systemctl restart minority.service

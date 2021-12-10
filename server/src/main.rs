@@ -13,16 +13,21 @@ use bonsaidb::{
         schema::{Collection, CollectionDocument},
     },
     server::{
-        Backend, BackendError, Configuration, ConnectedClient, ConnectionHandling,
+        cli::Command, Backend, BackendError, Configuration, ConnectedClient, ConnectionHandling,
         CustomApiDispatcher, CustomServer, DefaultPermissions, ServerDatabase,
     },
 };
 use minority_game_shared::{Api, Choice, Request, RequestDispatcher, Response, SetChoiceHandler};
+use structopt::StructOpt;
 use tokio::time::Instant;
 
-use crate::schema::{GameSchema, Player};
+use crate::{
+    schema::{GameSchema, Player},
+    webserver::WebServer,
+};
 
 mod schema;
+mod webserver;
 
 const DATABASE_NAME: &str = "minority-game";
 const SECONDS_PER_ROUND: u32 = 5;
@@ -31,27 +36,46 @@ const HAD_FUN_HAPPINESS_MULTIPLIER: f32 = 1.5;
 const STAYED_IN_MULTIPLIER: f32 = 0.2;
 
 #[tokio::main]
+#[cfg_attr(not(debug_assertions), allow(unused_mut))]
 async fn main() -> anyhow::Result<()> {
+    let command = Command::<Game>::from_args();
+
     let server = CustomServer::<Game>::open(
         Path::new("minority-game.bonsaidb"),
         Configuration {
+            server_name: String::from("minority-game.gooey.rs"),
             default_permissions: DefaultPermissions::AllowAll,
             ..Configuration::default()
         },
     )
     .await?;
-    server.register_schema::<GameSchema>().await?;
-    // Create the database if it doesn't exist.
-    server
-        .create_database::<GameSchema>(DATABASE_NAME, true)
-        .await?;
-    // Start listening for websockets. This does not return until the server
-    // shuts down. If you want to listen for multiple types of traffic, you will
-    // need to spawn the tasks.
-    server
-        .listen_for_websockets_on("127.0.0.1:8081", false)
-        .await?;
 
+    match command {
+        Command::Certificate(cert_command) => cert_command.execute(server).await?,
+        Command::Serve(mut serve_command) => {
+            #[cfg(debug_assertions)]
+            if serve_command.http_port.is_none() {
+                use std::net::{Ipv6Addr, SocketAddr, SocketAddrV6};
+
+                serve_command.http_port = Some(SocketAddr::V6(SocketAddrV6::new(
+                    Ipv6Addr::UNSPECIFIED,
+                    8080,
+                    0,
+                    0,
+                )));
+                serve_command.https_port = Some(SocketAddr::V6(SocketAddrV6::new(
+                    Ipv6Addr::UNSPECIFIED,
+                    8081,
+                    0,
+                    0,
+                )));
+            }
+
+            serve_command
+                .execute_with(server.clone(), WebServer::new(server))
+                .await?
+        }
+    }
     Ok(())
 }
 
@@ -65,6 +89,12 @@ impl Backend for Game {
     type CustomApiDispatcher = ApiDispatcher;
 
     async fn initialize(server: &CustomServer<Self>) {
+        server.register_schema::<GameSchema>().await.unwrap();
+        server
+            .create_database::<GameSchema>(DATABASE_NAME, true)
+            .await
+            .unwrap();
+
         tokio::spawn(game_loop(server.clone()));
     }
 
