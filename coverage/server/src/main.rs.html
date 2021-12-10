@@ -15,7 +15,7 @@
         <div>
             <p class="heading">Lines</p>
             <p class="title has-text-danger">
-                <abbr title="1 / 221">0.45 %</abbr></p>
+                <abbr title="1 / 219">0.46 %</abbr></p>
         </div>
     </div>
 
@@ -1187,11 +1187,11 @@
                 <a href="#89">89</a>
             </div>
             <div
-                class="column is-1 is-narrow p-0 has-text-centered has-text-danger-light has-background-danger">
+                class="column is-1 is-narrow p-0 has-text-centered has-text-white has-background-white">
                 
             </div>
-            <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">            serve_command</pre>
+            <div class="column has-background-white p-0">
+                <pre class="has-background-white py-0 px-2">            serve_command</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -1204,7 +1204,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                .execute_with(server.clone(), WebServer::new(server))</pre>
+                <pre class="has-background-danger-light py-0 px-2">                .execute_with(server.clone(), WebServer::new(server).await)</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3518,7 +3518,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                player.contents.times_went_out += 1;</pre>
+                <pre class="has-background-danger-light py-0 px-2">                player.contents.stats.times_went_out += 1;</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3544,7 +3544,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                    player.contents.happiness =</pre>
+                <pre class="has-background-danger-light py-0 px-2">                    player.contents.stats.happiness =</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3557,7 +3557,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                        (player.contents.happiness * HAD_FUN_HAPPINESS_MULTIPLIER).min(1.);</pre>
+                <pre class="has-background-danger-light py-0 px-2">                        (player.contents.stats.happiness * HAD_FUN_HAPPINESS_MULTIPLIER).min(1.);</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3583,7 +3583,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                    player.contents.happiness *= TOO_BUSY_HAPPINESS_MULTIPLIER;</pre>
+                <pre class="has-background-danger-light py-0 px-2">                    player.contents.stats.happiness *= TOO_BUSY_HAPPINESS_MULTIPLIER;</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3635,7 +3635,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                player.contents.times_stayed_in += 1;</pre>
+                <pre class="has-background-danger-light py-0 px-2">                player.contents.stats.times_stayed_in += 1;</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3648,7 +3648,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                player.contents.happiness = (player.contents.happiness</pre>
+                <pre class="has-background-danger-light py-0 px-2">                player.contents.stats.happiness = (player.contents.stats.happiness</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3661,7 +3661,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">                    + (0.5 - player.contents.happiness) * STAYED_IN_MULTIPLIER)</pre>
+                <pre class="has-background-danger-light py-0 px-2">                    + (0.5 - player.contents.stats.happiness) * STAYED_IN_MULTIPLIER)</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -3921,7 +3921,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">            happiness: player.contents.happiness,</pre>
+                <pre class="has-background-danger-light py-0 px-2">            happiness: player.contents.stats.happiness,</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4255,11 +4255,11 @@
                 <a href="#325">325</a>
             </div>
             <div
-                class="column is-1 is-narrow p-0 has-text-centered has-text-danger-light has-background-danger">
+                class="column is-1 is-narrow p-0 has-text-centered has-text-white has-background-white">
                 
             </div>
-            <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">    for client in clients {</pre>
+            <div class="column has-background-white p-0">
+                <pre class="has-background-white py-0 px-2"></pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4272,7 +4272,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">        let mut player = client.client_data().await;</pre>
+                <pre class="has-background-danger-light py-0 px-2">    for client in clients {</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4285,7 +4285,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">        let player = player</pre>
+                <pre class="has-background-danger-light py-0 px-2">        let mut player = client.client_data().await;</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4298,7 +4298,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">            .as_mut()</pre>
+                <pre class="has-background-danger-light py-0 px-2">        if let Some(player) = player.as_mut() {</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4311,7 +4311,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">            .expect(&quot;all connected clients should have a player record&quot;);</pre>
+                <pre class="has-background-danger-light py-0 px-2">            clients_by_player_id.insert(player.id, client.clone());</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4324,7 +4324,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">        if player.contents.choice.is_some() {</pre>
+                <pre class="has-background-danger-light py-0 px-2">            if player.contents.choice.is_some() {</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4337,7 +4337,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">            players.push(player.clone());</pre>
+                <pre class="has-background-danger-light py-0 px-2">                players.push(player.clone());</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4350,7 +4350,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">            clients_by_player_id.insert(player.id, client.clone());</pre>
+                <pre class="has-background-danger-light py-0 px-2">            }</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4467,7 +4467,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">        assert!(!a.contents.happiness.is_nan() &amp;&amp; !b.contents.happiness.is_nan());</pre>
+                <pre class="has-background-danger-light py-0 px-2">        assert!(!a.contents.stats.happiness.is_nan() &amp;&amp; !b.contents.stats.happiness.is_nan());</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4480,7 +4480,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">        if approx::relative_eq!(a.contents.happiness, b.contents.happiness) {</pre>
+                <pre class="has-background-danger-light py-0 px-2">        if approx::relative_eq!(a.contents.stats.happiness, b.contents.stats.happiness) {</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4506,7 +4506,7 @@
                 
             </div>
             <div class="column has-background-danger-light p-0">
-                <pre class="has-background-danger-light py-0 px-2">        } else if a.contents.happiness &lt; b.contents.happiness {</pre>
+                <pre class="has-background-danger-light py-0 px-2">        } else if a.contents.stats.happiness &lt; b.contents.stats.happiness {</pre>
             </div>
         </div><div class="columns p-0 m-0">
             <div
@@ -4589,7 +4589,7 @@
         </div></div>
         <footer class="footer">
             <div class="content has-text-centered">
-                <p class="heading">Date: 2021-12-10 05:22</p>
+                <p class="heading">Date: 2021-12-10 22:02</p>
             </div>
         </footer>
     </body>
