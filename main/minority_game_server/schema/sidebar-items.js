@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["AUTHORITY",""]],"enum":[["GameSchema",""]],"struct":[["Player",""]]});
+initSidebarItems({"constant":[["AUTHORITY",""]],"enum":[["GameSchema",""]],"struct":[["Player",""],["PlayerByScore",""],["PlayerStats",""]]});

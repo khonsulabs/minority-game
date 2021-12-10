@@ -290,7 +290,7 @@
     },
     <span class="ident">App</span>,
 };
-<span class="kw">use</span> <span class="ident">minority_game_shared</span>::{<span class="ident">Api</span>, <span class="ident">Choice</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident">minority_game_shared</span>::{<span class="ident">happiness_as_whole_percent</span>, <span class="ident">Api</span>, <span class="ident">Choice</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="comment">// The user interface and database will be run separately, and flume</span>
@@ -482,7 +482,7 @@
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">api_callback_context</span>.<span class="ident">context</span>.<span class="ident">send_command</span>(<span class="ident">ComponentCommand::Behavior</span>(<span class="ident">GameInterfaceEvent::UpdateStatus</span>(
                         <span class="macro">format!</span>(<span class="string">&quot;Welcome {}! Current happiness: {}&quot;</span>,
                             <span class="ident">player_id</span>,
-                            (<span class="ident">happiness</span> <span class="op">*</span> <span class="number">100.</span>) <span class="kw">as</span> <span class="ident">u32</span>,
+                            <span class="ident">happiness_as_whole_percent</span>(<span class="ident">happiness</span>),
                         )
                     )));
                 }
@@ -500,7 +500,7 @@
                             } <span class="kw">else</span> {
                                 <span class="string">&quot;lost&quot;</span>
                             },
-                            (<span class="ident">happiness</span> <span class="op">*</span> <span class="number">100.</span>) <span class="kw">as</span> <span class="ident">u32</span>,
+                            <span class="ident">happiness_as_whole_percent</span>(<span class="ident">happiness</span>),
                             <span class="ident">current_rank</span>,
                             <span class="ident">number_of_players</span>
                         )

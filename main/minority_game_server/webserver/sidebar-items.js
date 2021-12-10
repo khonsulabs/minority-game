@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["PKG_PATH",""],["STATIC_PATH",""]],"fn":[["spa_index",""],["upgrade_websocket",""]],"struct":[["WebServer",""]]});
+initSidebarItems({"constant":[["PKG_PATH",""],["STATIC_PATH",""]],"fn":[["index",""],["spa_index",""],["stats",""],["stats_template",""],["upgrade_websocket",""]],"struct":[["RankedPlayer",""],["Stats",""],["WebServer",""]]});

@@ -437,7 +437,7 @@
             }
 
             <span class="ident">serve_command</span>
-                .<span class="ident">execute_with</span>(<span class="ident">server</span>.<span class="ident">clone</span>(), <span class="ident">WebServer::new</span>(<span class="ident">server</span>))
+                .<span class="ident">execute_with</span>(<span class="ident">server</span>.<span class="ident">clone</span>(), <span class="ident">WebServer::new</span>(<span class="ident">server</span>).<span class="kw">await</span>)
                 .<span class="kw">await</span><span class="question-mark">?</span>
         }
     }
@@ -615,18 +615,18 @@
     <span class="kw">for</span> <span class="ident">player</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">players</span> {
         <span class="kw">match</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">choice</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>() {
             <span class="ident">Choice::GoOut</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">times_went_out</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">times_went_out</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="kw">if</span> <span class="ident">had_fun</span> {
-                    <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span> <span class="op">=</span>
-                        (<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span> <span class="op">*</span> <span class="ident">HAD_FUN_HAPPINESS_MULTIPLIER</span>).<span class="ident">min</span>(<span class="number">1.</span>);
+                    <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="op">=</span>
+                        (<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="op">*</span> <span class="ident">HAD_FUN_HAPPINESS_MULTIPLIER</span>).<span class="ident">min</span>(<span class="number">1.</span>);
                 } <span class="kw">else</span> {
-                    <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">TOO_BUSY_HAPPINESS_MULTIPLIER</span>;
+                    <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">TOO_BUSY_HAPPINESS_MULTIPLIER</span>;
                 }
             }
             <span class="ident">Choice::StayIn</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">times_stayed_in</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span> <span class="op">=</span> (<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>
-                    <span class="op">+</span> (<span class="number">0.5</span> <span class="op">-</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>) <span class="op">*</span> <span class="ident">STAYED_IN_MULTIPLIER</span>)
+                <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">times_stayed_in</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="op">=</span> (<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>
+                    <span class="op">+</span> (<span class="number">0.5</span> <span class="op">-</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>) <span class="op">*</span> <span class="ident">STAYED_IN_MULTIPLIER</span>)
                     .<span class="ident">min</span>(<span class="number">1.</span>);
             }
         }
@@ -646,7 +646,7 @@
         };
         <span class="ident">drop</span>(<span class="ident">client</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">Response::RoundComplete</span> {
             <span class="ident">won</span>,
-            <span class="ident">happiness</span>: <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>,
+            <span class="ident">happiness</span>: <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>,
             <span class="ident">current_rank</span>: <span class="ident">index</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">1</span>,
             <span class="ident">number_of_players</span>,
         })));
@@ -672,14 +672,14 @@
 <span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">players</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clients_by_player_id</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+
     <span class="kw">for</span> <span class="ident">client</span> <span class="kw">in</span> <span class="ident">clients</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">player</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">client_data</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">player</span> <span class="op">=</span> <span class="ident">player</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;all connected clients should have a player record&quot;</span>);
-        <span class="kw">if</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">choice</span>.<span class="ident">is_some</span>() {
-            <span class="ident">players</span>.<span class="ident">push</span>(<span class="ident">player</span>.<span class="ident">clone</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">player</span>) <span class="op">=</span> <span class="ident">player</span>.<span class="ident">as_mut</span>() {
             <span class="ident">clients_by_player_id</span>.<span class="ident">insert</span>(<span class="ident">player</span>.<span class="ident">id</span>, <span class="ident">client</span>.<span class="ident">clone</span>());
+            <span class="kw">if</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">choice</span>.<span class="ident">is_some</span>() {
+                <span class="ident">players</span>.<span class="ident">push</span>(<span class="ident">player</span>.<span class="ident">clone</span>());
+            }
         }
     }
 
@@ -688,10 +688,10 @@
 
 <span class="kw">fn</span> <span class="ident">sort_players</span>(<span class="ident">players</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">CollectionDocument</span><span class="op">&lt;</span><span class="ident">Player</span><span class="op">&gt;</span>]) {
     <span class="ident">players</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">a</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>.<span class="ident">is_nan</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">b</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>.<span class="ident">is_nan</span>());
-        <span class="kw">if</span> <span class="macro">approx::relative_eq!</span>(<span class="ident">a</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>, <span class="ident">b</span>.<span class="ident">contents</span>.<span class="ident">happiness</span>) {
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">a</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>.<span class="ident">is_nan</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">b</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>.<span class="ident">is_nan</span>());
+        <span class="kw">if</span> <span class="macro">approx::relative_eq!</span>(<span class="ident">a</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>, <span class="ident">b</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>) {
             <span class="ident">Ordering::Equal</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">contents</span>.<span class="ident">happiness</span> <span class="op">&lt;</span> <span class="ident">b</span>.<span class="ident">contents</span>.<span class="ident">happiness</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="op">&lt;</span> <span class="ident">b</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> {
             <span class="ident">Ordering::Less</span>
         } <span class="kw">else</span> {
             <span class="ident">Ordering::Greater</span>
