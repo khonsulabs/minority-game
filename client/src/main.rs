@@ -12,7 +12,7 @@ use gooey::{
     },
     App,
 };
-use minority_game_shared::{Api, Choice, Request, Response};
+use minority_game_shared::{happiness_as_whole_percent, Api, Choice, Request, Response};
 
 fn main() {
     // The user interface and database will be run separately, and flume
@@ -204,7 +204,7 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                     let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
                         format!("Welcome {}! Current happiness: {}",
                             player_id,
-                            (happiness * 100.) as u32,
+                            happiness_as_whole_percent(happiness),
                         )
                     )));
                 }
@@ -222,7 +222,7 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                             } else {
                                 "lost"
                             },
-                            (happiness * 100.) as u32,
+                            happiness_as_whole_percent(happiness),
                             current_rank,
                             number_of_players
                         )

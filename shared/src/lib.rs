@@ -46,3 +46,7 @@ impl CustomApi for Api {
     type Request = Request;
     type Response = Response;
 }
+
+pub fn happiness_as_whole_percent(happiness: f32) -> u32 {
+    (happiness * 100.).round() as u32
+}

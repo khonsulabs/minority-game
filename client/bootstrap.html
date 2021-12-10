@@ -8,8 +8,8 @@
 <body id="gooey">
   <script type="module">
     window.addEventListener("load", () => {
-      import('./pkg/minority-game-client.js').then(function (module) {
-        module.default('./pkg/minority-game-client_bg.wasm');
+      import('/pkg/minority-game-client.js').then(function (module) {
+        module.default('/pkg/minority-game-client_bg.wasm');
       });
     });
   </script>

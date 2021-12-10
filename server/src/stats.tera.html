@@ -1,0 +1,80 @@
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/minstyle.io@1.1.0/css/minstyle.io.css">
+</head>
+
+<body>
+    <h1>Minority Game Statistics</h1>
+
+    <h3>Current Players</h3>
+    {% if current_players %}
+    <table class="ms-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player ID</th>
+                <th>Happiness</th>
+                <th># of Games</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in current_players %}
+            <tr>
+                <td>{{ player.rank }}</td>
+                <td>{{ player.id }}</td>
+                <td>
+                    <div class="ms-progress">
+                        <div class="ms-progress-fill" style="width: {{ player.happiness }}%;">
+                            {{ player.happiness }}%
+                        </div>
+                    </div>
+                </td>
+                <td>{{ player.times_went_out + player.times_stayed_in }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="ms-alert ms-info">
+        There are no current players.
+    </div>
+    {% endif %}
+
+    <h3>Top Players</h3>
+    {% if top_players %}
+    <table class="ms-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player ID</th>
+                <th>Happiness</th>
+                <th># of Games</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in top_players %}
+            <tr>
+                <td>{{ player.rank }}</td>
+                <td>{{ player.id }}</td>
+                <td>
+                    <div class="ms-progress">
+                        <div class="ms-progress-fill" style="width: {{ player.happiness }}%;">{{ player.happiness }}%
+                        </div>
+                    </div>
+                </td>
+                <td>{{ player.times_went_out + player.times_stayed_in }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="ms-alert ms-info">
+        There are no current players.
+    </div>
+    {% endif %}
+</body>
+
+</html>

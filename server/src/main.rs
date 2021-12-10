@@ -87,7 +87,7 @@ async fn main() -> anyhow::Result<()> {
             }
 
             serve_command
-                .execute_with(server.clone(), WebServer::new(server))
+                .execute_with(server.clone(), WebServer::new(server).await)
                 .await?
         }
     }
@@ -265,18 +265,18 @@ async fn play_game(
     for player in &mut players {
         match player.contents.choice.take().unwrap() {
             Choice::GoOut => {
-                player.contents.times_went_out += 1;
+                player.contents.stats.times_went_out += 1;
                 if had_fun {
-                    player.contents.happiness =
-                        (player.contents.happiness * HAD_FUN_HAPPINESS_MULTIPLIER).min(1.);
+                    player.contents.stats.happiness =
+                        (player.contents.stats.happiness * HAD_FUN_HAPPINESS_MULTIPLIER).min(1.);
                 } else {
-                    player.contents.happiness *= TOO_BUSY_HAPPINESS_MULTIPLIER;
+                    player.contents.stats.happiness *= TOO_BUSY_HAPPINESS_MULTIPLIER;
                 }
             }
             Choice::StayIn => {
-                player.contents.times_stayed_in += 1;
-                player.contents.happiness = (player.contents.happiness
-                    + (0.5 - player.contents.happiness) * STAYED_IN_MULTIPLIER)
+                player.contents.stats.times_stayed_in += 1;
+                player.contents.stats.happiness = (player.contents.stats.happiness
+                    + (0.5 - player.contents.stats.happiness) * STAYED_IN_MULTIPLIER)
                     .min(1.);
             }
         }
@@ -296,7 +296,7 @@ async fn play_game(
         };
         drop(client.send(Ok(Response::RoundComplete {
             won,
-            happiness: player.contents.happiness,
+            happiness: player.contents.stats.happiness,
             current_rank: index as u32 + 1,
             number_of_players,
         })));
@@ -322,14 +322,14 @@ async fn collect_players(
 > {
     let mut players = Vec::new();
     let mut clients_by_player_id = HashMap::new();
+
     for client in clients {
         let mut player = client.client_data().await;
-        let player = player
-            .as_mut()
-            .expect("all connected clients should have a player record");
-        if player.contents.choice.is_some() {
-            players.push(player.clone());
+        if let Some(player) = player.as_mut() {
             clients_by_player_id.insert(player.id, client.clone());
+            if player.contents.choice.is_some() {
+                players.push(player.clone());
+            }
         }
     }
 
@@ -338,10 +338,10 @@ async fn collect_players(
 
 fn sort_players(players: &mut [CollectionDocument<Player>]) {
     players.sort_by(|a, b| {
-        assert!(!a.contents.happiness.is_nan() && !b.contents.happiness.is_nan());
-        if approx::relative_eq!(a.contents.happiness, b.contents.happiness) {
+        assert!(!a.contents.stats.happiness.is_nan() && !b.contents.stats.happiness.is_nan());
+        if approx::relative_eq!(a.contents.stats.happiness, b.contents.stats.happiness) {
             Ordering::Equal
-        } else if a.contents.happiness < b.contents.happiness {
+        } else if a.contents.stats.happiness < b.contents.stats.happiness {
             Ordering::Less
         } else {
             Ordering::Greater

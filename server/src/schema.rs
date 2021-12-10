@@ -1,5 +1,6 @@
 use bonsaidb::core::schema::{
-    Collection, CollectionName, InvalidNameError, Schema, SchemaName, Schematic,
+    Collection, CollectionDocument, CollectionName, CollectionView, InvalidNameError, MapResult,
+    Name, Schema, SchemaName, Schematic,
 };
 use minority_game_shared::Choice;
 use serde::{Deserialize, Serialize};
@@ -21,22 +22,33 @@ impl Schema for GameSchema {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct Player {
-    pub happiness: f32,
     pub choice: Option<Choice>,
+    pub stats: PlayerStats,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PlayerStats {
+    pub happiness: f32,
     pub times_went_out: u32,
     pub times_stayed_in: u32,
 }
 
-impl Default for Player {
+impl Default for PlayerStats {
     fn default() -> Self {
         Self {
             happiness: 0.5,
-            choice: None,
             times_went_out: 0,
             times_stayed_in: 0,
         }
+    }
+}
+
+impl PlayerStats {
+    pub fn score(&self) -> u32 {
+        let total_games = self.times_stayed_in + self.times_went_out;
+        (self.happiness * total_games as f32) as u32
     }
 }
 
@@ -45,7 +57,35 @@ impl Collection for Player {
         CollectionName::new("minority-game", "player")
     }
 
-    fn define_views(_schema: &mut Schematic) -> Result<(), bonsaidb::core::Error> {
+    fn define_views(schema: &mut Schematic) -> Result<(), bonsaidb::core::Error> {
+        schema.define_view(PlayerByScore)?;
         Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct PlayerByScore;
+
+impl CollectionView for PlayerByScore {
+    type Collection = Player;
+    type Key = u32;
+    type Value = PlayerStats;
+
+    fn version(&self) -> u64 {
+        2
+    }
+
+    fn name(&self) -> Result<Name, InvalidNameError> {
+        Name::new("by-score")
+    }
+
+    fn map(
+        &self,
+        player: CollectionDocument<Self::Collection>,
+    ) -> MapResult<Self::Key, Self::Value> {
+        Ok(vec![player.emit_key_and_value(
+            player.contents.stats.score(),
+            player.contents.stats.clone(),
+        )])
     }
 }
