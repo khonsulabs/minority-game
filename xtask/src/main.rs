@@ -1,10 +1,13 @@
-use devx_cmd::run;
+use devx_cmd::{run, Cmd};
 use khonsu_tools::{anyhow, code_coverage::CodeCoverage};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 enum Args {
-    BuildWebApp,
+    BuildWebApp {
+        #[structopt(long = "release")]
+        release: bool,
+    },
     GenerateCodeCoverageReport {
         #[structopt(long = "install-dependencies")]
         install_dependencies: bool,
@@ -14,7 +17,7 @@ enum Args {
 fn main() -> anyhow::Result<()> {
     let args = Args::from_args();
     match args {
-        Args::BuildWebApp => build_web_app()?,
+        Args::BuildWebApp { release } => build_web_app(release)?,
         Args::GenerateCodeCoverageReport {
             install_dependencies,
         } => CodeCoverage::<CodeCoverageConfig>::execute(install_dependencies)?,
@@ -22,9 +25,9 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn build_web_app() -> Result<(), anyhow::Error> {
-    run!(
-        "cargo",
+fn build_web_app(release: bool) -> Result<(), anyhow::Error> {
+    let mut cmd = Cmd::new("cargo");
+    let cmd = cmd.args([
         "build",
         "--package",
         "minority-game-client",
@@ -32,10 +35,18 @@ fn build_web_app() -> Result<(), anyhow::Error> {
         "wasm32-unknown-unknown",
         "--target-dir",
         "target/wasm",
-    )?;
+    ]);
+    if release {
+        cmd.arg("--release");
+    }
+    cmd.run()?;
 
     execute_wasm_bindgen(
-        "target/wasm/wasm32-unknown-unknown/debug/minority-game-client.wasm",
+        if release {
+            "target/wasm/wasm32-unknown-unknown/release/minority-game-client.wasm"
+        } else {
+            "target/wasm/wasm32-unknown-unknown/debug/minority-game-client.wasm"
+        },
         "client/pkg/",
     )?;
 

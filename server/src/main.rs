@@ -51,7 +51,22 @@ async fn main() -> anyhow::Result<()> {
     .await?;
 
     match command {
-        Command::Certificate(cert_command) => cert_command.execute(server).await?,
+        Command::Certificate(cert_command) => {
+            let is_installing_self_signed = matches!(
+                cert_command,
+                bonsaidb::server::cli::certificate::Command::InstallSelfSigned { .. }
+            );
+            cert_command.execute(server.clone()).await?;
+            if is_installing_self_signed {
+                if let Ok(chain) = server.certificate_chain().await {
+                    tokio::fs::write(
+                        server.path().join("public-certificate.der"),
+                        &chain.end_entity_certificate(),
+                    )
+                    .await?;
+                }
+            }
+        }
         Command::Serve(mut serve_command) => {
             #[cfg(debug_assertions)]
             if serve_command.http_port.is_none() {

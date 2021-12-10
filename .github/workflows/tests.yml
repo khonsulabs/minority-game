@@ -36,7 +36,7 @@ jobs:
       - name: Build web app
         run: |
           rustup target add wasm32-unknown-unknown
-          cargo xtask build-web-app
+          cargo xtask build-web-app --release
 
       - name: Build executable
         run: |

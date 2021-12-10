@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use bonsaidb::client::Client;
+use cfg_if::cfg_if;
 use gooey::{
     core::{Context, StyledWidget},
     widgets::{
@@ -158,6 +159,31 @@ struct DatabaseContext {
     context: Context<Component<GameInterface>>,
 }
 
+async fn client() -> bonsaidb::client::Builder<()> {
+    cfg_if! {
+        if #[cfg(target_arch = "wasm32")] {
+            cfg_if!{
+                if #[cfg(debug_assertions)] {
+                    Client::build("ws://127.0.0.1:8080/ws".parse().unwrap())
+                } else {
+                    Client::build("wss://minority-game.gooey.rs/ws".parse().unwrap())
+                }
+            }
+        } else {
+            // Native
+            cfg_if!{
+                if #[cfg(debug_assertions)] {
+                    let certificate = tokio::fs::read("minority-game.bonsaidb/public-certificate.der").await.unwrap();
+                    Client::build("bonsaidb://127.0.0.1".parse().unwrap()).with_certificate(bonsaidb::client::fabruic::Certificate::from_der(certificate).unwrap())
+                } else {
+                    Client::build("bonsaidb://minority-game.gooey.rs".parse().unwrap())
+                }
+            }
+
+        }
+    }
+}
+
 /// Processes each command from `receiver` as it becomes available.
 async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
     let database = match receiver.recv_async().await.unwrap() {
@@ -169,7 +195,7 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
     // launches the server.
     let client = loop {
         let api_callback_context = database.clone();
-        match Client::build("ws://127.0.0.1:8080/ws".parse().unwrap())
+        match client().await
             .with_custom_api_callback::<Api, _>(move |response| match response {
                 Ok(Response::Welcome {
                     happiness,
