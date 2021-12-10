@@ -333,6 +333,21 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">cmp::Ordering</span>,
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
@@ -386,7 +401,22 @@
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">command</span> {
-        <span class="ident">Command::Certificate</span>(<span class="ident">cert_command</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cert_command</span>.<span class="ident">execute</span>(<span class="ident">server</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Command::Certificate</span>(<span class="ident">cert_command</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">is_installing_self_signed</span> <span class="op">=</span> <span class="macro">matches!</span>(
+                <span class="ident">cert_command</span>,
+                <span class="ident">bonsaidb::server::cli::certificate::Command::InstallSelfSigned</span> { .. }
+            );
+            <span class="ident">cert_command</span>.<span class="ident">execute</span>(<span class="ident">server</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">is_installing_self_signed</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">chain</span>) <span class="op">=</span> <span class="ident">server</span>.<span class="ident">certificate_chain</span>().<span class="kw">await</span> {
+                    <span class="ident">tokio::fs::write</span>(
+                        <span class="ident">server</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;public-certificate.der&quot;</span>),
+                        <span class="kw-2">&amp;</span><span class="ident">chain</span>.<span class="ident">end_entity_certificate</span>(),
+                    )
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                }
+            }
+        }
         <span class="ident">Command::Serve</span>(<span class="kw-2">mut</span> <span class="ident">serve_command</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
             <span class="kw">if</span> <span class="ident">serve_command</span>.<span class="ident">http_port</span>.<span class="ident">is_none</span>() {
