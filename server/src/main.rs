@@ -18,6 +18,7 @@ use bonsaidb::{
     },
 };
 use minority_game_shared::{Api, Choice, Request, RequestDispatcher, Response, SetChoiceHandler};
+use rand::{thread_rng, Rng};
 use structopt::StructOpt;
 use tokio::time::Instant;
 
@@ -248,20 +249,33 @@ async fn play_game(
         return Ok(GameState::Idle);
     }
 
-    let mut going_out = HashSet::new();
-    let mut staying_in = HashSet::new();
+    let mut going_out_player_ids = HashSet::new();
+    let mut going_out = 0_u32;
+    let mut staying_in = 0_u32;
     for player in &players {
         match player.contents.choice.unwrap() {
             Choice::GoOut => {
-                going_out.insert(player.id);
+                going_out_player_ids.insert(player.id);
+                going_out += 1;
             }
             Choice::StayIn => {
-                staying_in.insert(player.id);
+                staying_in += 1;
             }
         }
     }
 
-    let had_fun = going_out.len() < staying_in.len();
+    {
+        let mut rng = thread_rng();
+        while going_out + staying_in < 3 {
+            if rng.gen_bool(0.5) {
+                going_out += 1;
+            } else {
+                staying_in += 1;
+            }
+        }
+    }
+
+    let had_fun = going_out <= staying_in;
     for player in &mut players {
         match player.contents.choice.take().unwrap() {
             Choice::GoOut => {
@@ -289,10 +303,10 @@ async fn play_game(
     let number_of_players = players.len() as u32;
     for (index, player) in players.into_iter().enumerate() {
         let client = &clients_by_player_id[&player.id];
-        let won = if had_fun {
-            going_out.contains(&player.id)
+        let won = if going_out_player_ids.contains(&player.id) {
+            had_fun
         } else {
-            staying_in.contains(&player.id)
+            player.contents.stats.happiness < 0.5
         };
         drop(client.send(Ok(Response::RoundComplete {
             won,
