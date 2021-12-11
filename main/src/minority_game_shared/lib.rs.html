@@ -50,6 +50,13 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bonsaidb::core::custom_api</span>::{<span class="ident">CustomApi</span>, <span class="ident">Infallible</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -59,6 +66,9 @@
     <span class="doccomment">/// Set the current choice.</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actionable-traits&quot;</span>, <span class="ident">actionable</span>(<span class="ident">protection</span> <span class="op">=</span> <span class="string">&quot;none&quot;</span>))]</span>
     <span class="ident">SetChoice</span>(<span class="ident">Choice</span>),
+    <span class="doccomment">/// Set the current tell.</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actionable-traits&quot;</span>, <span class="ident">actionable</span>(<span class="ident">protection</span> <span class="op">=</span> <span class="string">&quot;none&quot;</span>))]</span>
+    <span class="ident">SetTell</span>(<span class="ident">Choice</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
@@ -80,6 +90,8 @@
         <span class="ident">seconds_remaining</span>: <span class="ident">u32</span>,
         <span class="ident">number_of_players</span>: <span class="ident">u32</span>,
         <span class="ident">current_rank</span>: <span class="ident">u32</span>,
+        <span class="ident">number_of_tells</span>: <span class="ident">u32</span>,
+        <span class="ident">tells_going_out</span>: <span class="ident">u32</span>,
     },
 
     <span class="ident">RoundComplete</span> {
@@ -87,6 +99,8 @@
         <span class="ident">happiness</span>: <span class="ident">f32</span>,
         <span class="ident">current_rank</span>: <span class="ident">u32</span>,
         <span class="ident">number_of_players</span>: <span class="ident">u32</span>,
+        <span class="ident">number_of_liars</span>: <span class="ident">u32</span>,
+        <span class="ident">number_of_tells</span>: <span class="ident">u32</span>,
     },
 }
 
@@ -99,7 +113,7 @@
     <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">happiness_as_whole_percent</span>(<span class="ident">happiness</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">whole_percent</span>(<span class="ident">happiness</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
     (<span class="ident">happiness</span> <span class="op">*</span> <span class="number">100.</span>).<span class="ident">round</span>() <span class="kw">as</span> <span class="ident">u32</span>
 }
 </code></pre></div>

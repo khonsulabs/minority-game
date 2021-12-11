@@ -276,12 +276,89 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">use</span> <span class="ident">bonsaidb::client::Client</span>;
 <span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
 <span class="kw">use</span> <span class="ident">gooey</span>::{
-    <span class="ident">core</span>::{<span class="ident">Context</span>, <span class="ident">StyledWidget</span>},
+    <span class="ident">core</span>::{<span class="ident">figures::Size</span>, <span class="ident">Context</span>, <span class="ident">StyledWidget</span>, <span class="ident">WindowBuilder</span>},
     <span class="ident">widgets</span>::{
         <span class="ident">button::Button</span>,
         <span class="ident">component</span>::{<span class="ident">Behavior</span>, <span class="ident">Component</span>, <span class="ident">ComponentCommand</span>, <span class="ident">Content</span>, <span class="ident">EventMapper</span>},
@@ -290,7 +367,7 @@
     },
     <span class="ident">App</span>,
 };
-<span class="kw">use</span> <span class="ident">minority_game_shared</span>::{<span class="ident">happiness_as_whole_percent</span>, <span class="ident">Api</span>, <span class="ident">Choice</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident">minority_game_shared</span>::{<span class="ident">whole_percent</span>, <span class="ident">Api</span>, <span class="ident">Choice</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="comment">// The user interface and database will be run separately, and flume</span>
@@ -301,10 +378,13 @@
     <span class="comment">// Spawn an async task that processes commands sent by `command_sender`.</span>
     <span class="ident">App::spawn</span>(<span class="ident">process_database_commands</span>(<span class="ident">command_receiver</span>));
 
-    <span class="ident">App::from_root</span>(<span class="op">|</span><span class="ident">storage</span><span class="op">|</span>
-        <span class="comment">// The root widget is a `Component` with our component behavior</span>
-        <span class="comment">// `Counter`.</span>
-        <span class="ident">Component::new</span>(<span class="ident">GameInterface::new</span>(<span class="ident">command_sender</span>), <span class="ident">storage</span>))
+    <span class="ident">App::from</span>(
+        <span class="ident">WindowBuilder::new</span>(<span class="op">|</span><span class="ident">storage</span><span class="op">|</span>
+            <span class="comment">// The root widget is a `Component` with our component behavior</span>
+            <span class="comment">// `Counter`.</span>
+            <span class="ident">Component::new</span>(<span class="ident">GameInterface::new</span>(<span class="ident">command_sender</span>), <span class="ident">storage</span>))
+        .<span class="ident">size</span>(<span class="ident">Size::new</span>(<span class="number">512</span>, <span class="number">384</span>)),
+    )
     <span class="comment">// Register our custom component&#39;s transmogrifier.</span>
     .<span class="ident">with_component</span>::<span class="op">&lt;</span><span class="ident">GameInterface</span><span class="op">&gt;</span>()
     <span class="comment">// Run the app using the widget returned by the initializer.</span>
@@ -340,28 +420,81 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StyledWidget</span><span class="op">&lt;</span><span class="ident">Layout</span><span class="op">&gt;</span> {
         <span class="ident">builder</span>
             .<span class="ident">with</span>(
-                <span class="ident">CounterWidgets::GoOut</span>,
-                <span class="ident">Button::new</span>(<span class="string">&quot;Go Out&quot;</span>, <span class="ident">events</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">GameInterfaceEvent::GoOutClicked</span>)),
+                <span class="prelude-val">None</span>,
+                <span class="ident">Label::new</span>(<span class="string">&quot;This is an adaption of the game theory game \&quot;Minority Game\&quot;. Choose between staying in or going out. If more than 50% of the players go out, everyone who goes out will lose happiness because they have a bad time when everything is crowded. However, if it&#39;s not too crowed, the players who chose to go out will gain a significant amount of happiness. Those who choose to stay in will gravitate toward 50% happiness.&quot;</span>),
                 <span class="ident">WidgetLayout::build</span>()
-                    .<span class="ident">left</span>(<span class="ident">Dimension::zero</span>())
-                    .<span class="ident">top</span>(<span class="ident">Dimension::zero</span>())
+                    .<span class="ident">top</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">right</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">finish</span>(),
+            )
+            .<span class="ident">with</span>(
+                <span class="prelude-val">None</span>,
+                <span class="ident">Label::new</span>(<span class="string">&quot;Pick your choice:&quot;</span>),
+                <span class="ident">WidgetLayout::build</span>()
+                .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">100.</span>))
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">finish</span>(),
+            )
+            .<span class="ident">with</span>(
+                <span class="ident">CounterWidgets::GoOut</span>,
+                <span class="ident">Button::new</span>(
+                    <span class="string">&quot;Go Out&quot;</span>,
+                    <span class="ident">events</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">GameInterfaceEvent::ChoiceClicked</span>(<span class="ident">Choice::GoOut</span>)),
+                ),
+                <span class="ident">WidgetLayout::build</span>()
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">200.</span>))
+                    .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">100.</span>))
                     .<span class="ident">finish</span>(),
             )
             .<span class="ident">with</span>(
                 <span class="ident">CounterWidgets::StayIn</span>,
-                <span class="ident">Button::new</span>(<span class="string">&quot;Stay In&quot;</span>, <span class="ident">events</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">GameInterfaceEvent::StayInClicked</span>)),
+                <span class="ident">Button::new</span>(
+                    <span class="string">&quot;Stay In&quot;</span>,
+                    <span class="ident">events</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">GameInterfaceEvent::ChoiceClicked</span>(<span class="ident">Choice::StayIn</span>)),
+                ),
                 <span class="ident">WidgetLayout::build</span>()
-                    .<span class="ident">top</span>(<span class="ident">Dimension::zero</span>())
-                    .<span class="ident">right</span>(<span class="ident">Dimension::zero</span>())
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">250.</span>))
+                    .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">100.</span>))
+                    .<span class="ident">finish</span>(),
+            )
+            .<span class="ident">with</span>(
+                <span class="prelude-val">None</span>,
+                <span class="ident">Label::new</span>(<span class="string">&quot;Pick your tell (Optional):&quot;</span>),
+                <span class="ident">WidgetLayout::build</span>()
+                    .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">60.</span>))
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">finish</span>(),
+            )
+            .<span class="ident">with</span>(
+                <span class="ident">CounterWidgets::TellGoOut</span>,
+                <span class="ident">Button::new</span>(
+                    <span class="string">&quot;Go Out&quot;</span>,
+                    <span class="ident">events</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">GameInterfaceEvent::TellClicked</span>(<span class="ident">Choice::GoOut</span>)),
+                ),
+                <span class="ident">WidgetLayout::build</span>()
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">200.</span>))
+                    .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">60.</span>))
+                        .<span class="ident">finish</span>(),
+            )
+            .<span class="ident">with</span>(
+                <span class="ident">CounterWidgets::TellStayIn</span>,
+                <span class="ident">Button::new</span>(
+                    <span class="string">&quot;Stay In&quot;</span>,
+                    <span class="ident">events</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">GameInterfaceEvent::TellClicked</span>(<span class="ident">Choice::StayIn</span>)),
+                ),
+                <span class="ident">WidgetLayout::build</span>()
+                .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">250.</span>))
+                .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">60.</span>))
                     .<span class="ident">finish</span>(),
             )
             .<span class="ident">with</span>(
                 <span class="ident">CounterWidgets::Status</span>,
                 <span class="ident">Label::new</span>(<span class="string">&quot;Connecting...&quot;</span>),
                 <span class="ident">WidgetLayout::build</span>()
-                    .<span class="ident">bottom</span>(<span class="ident">Dimension::zero</span>())
-                    .<span class="ident">left</span>(<span class="ident">Dimension::zero</span>())
-                    .<span class="ident">right</span>(<span class="ident">Dimension::zero</span>())
+                    .<span class="ident">bottom</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">left</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
+                    .<span class="ident">right</span>(<span class="ident">Dimension::exact</span>(<span class="number">20.</span>))
                     .<span class="ident">finish</span>(),
             )
             .<span class="ident">finish</span>()
@@ -382,17 +515,17 @@
         <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="ident">Component</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) {
         <span class="kw">match</span> <span class="ident">event</span> {
-            <span class="ident">GameInterfaceEvent::GoOutClicked</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GameInterfaceEvent::ChoiceClicked</span>(<span class="ident">choice</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">component</span>
                     .<span class="ident">behavior</span>
                     .<span class="ident">command_sender</span>
-                    .<span class="ident">send</span>(<span class="ident">DatabaseCommand::SetChoice</span>(<span class="ident">Choice::GoOut</span>));
+                    .<span class="ident">send</span>(<span class="ident">DatabaseCommand::SetChoice</span>(<span class="ident">choice</span>));
             }
-            <span class="ident">GameInterfaceEvent::StayInClicked</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GameInterfaceEvent::TellClicked</span>(<span class="ident">choice</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">component</span>
                     .<span class="ident">behavior</span>
                     .<span class="ident">command_sender</span>
-                    .<span class="ident">send</span>(<span class="ident">DatabaseCommand::SetChoice</span>(<span class="ident">Choice::StayIn</span>));
+                    .<span class="ident">send</span>(<span class="ident">DatabaseCommand::SetTell</span>(<span class="ident">choice</span>));
             }
             <span class="ident">GameInterfaceEvent::UpdateStatus</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="ident">component</span>
@@ -412,12 +545,14 @@
     <span class="ident">GoOut</span>,
     <span class="ident">StayIn</span>,
     <span class="ident">Status</span>,
+    <span class="ident">TellGoOut</span>,
+    <span class="ident">TellStayIn</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">GameInterfaceEvent</span> {
-    <span class="ident">GoOutClicked</span>,
-    <span class="ident">StayInClicked</span>,
+    <span class="ident">ChoiceClicked</span>(<span class="ident">Choice</span>),
+    <span class="ident">TellClicked</span>(<span class="ident">Choice</span>),
     <span class="ident">UpdateStatus</span>(<span class="ident">String</span>),
 }
 
@@ -425,8 +560,8 @@
 <span class="kw">enum</span> <span class="ident">DatabaseCommand</span> {
     <span class="doccomment">/// Initializes the worker with a context, which</span>
     <span class="ident">Initialize</span>(<span class="ident">DatabaseContext</span>),
-    <span class="doccomment">/// Increment the counter.</span>
     <span class="ident">SetChoice</span>(<span class="ident">Choice</span>),
+    <span class="ident">SetTell</span>(<span class="ident">Choice</span>),
 }
 
 <span class="doccomment">/// A context provides the information necessary to communicate with the user</span>
@@ -482,7 +617,7 @@
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">api_callback_context</span>.<span class="ident">context</span>.<span class="ident">send_command</span>(<span class="ident">ComponentCommand::Behavior</span>(<span class="ident">GameInterfaceEvent::UpdateStatus</span>(
                         <span class="macro">format!</span>(<span class="string">&quot;Welcome {}! Current happiness: {}&quot;</span>,
                             <span class="ident">player_id</span>,
-                            <span class="ident">happiness_as_whole_percent</span>(<span class="ident">happiness</span>),
+                            <span class="ident">whole_percent</span>(<span class="ident">happiness</span>),
                         )
                     )));
                 }
@@ -492,15 +627,19 @@
                     <span class="ident">happiness</span>,
                     <span class="ident">current_rank</span>,
                     <span class="ident">number_of_players</span>,
+                    <span class="ident">number_of_liars</span>,
+                    <span class="ident">number_of_tells</span>
                 }) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">api_callback_context</span>.<span class="ident">context</span>.<span class="ident">send_command</span>(<span class="ident">ComponentCommand::Behavior</span>(<span class="ident">GameInterfaceEvent::UpdateStatus</span>(
-                        <span class="macro">format!</span>(<span class="string">&quot;You {}! Current happiness: {}%. Ranked {} of {} players in the last round.&quot;</span>,
+                        <span class="macro">format!</span>(<span class="string">&quot;You {}! {}/{} players lied about their intentions. Current happiness: {}%. Ranked {} of {} players in the last round.&quot;</span>,
                             <span class="kw">if</span> <span class="ident">won</span> {
                                 <span class="string">&quot;won&quot;</span>
                             } <span class="kw">else</span> {
                                 <span class="string">&quot;lost&quot;</span>
                             },
-                            <span class="ident">happiness_as_whole_percent</span>(<span class="ident">happiness</span>),
+                            <span class="ident">number_of_liars</span>,
+                            <span class="ident">number_of_tells</span>,
+                            <span class="ident">whole_percent</span>(<span class="ident">happiness</span>),
                             <span class="ident">current_rank</span>,
                             <span class="ident">number_of_players</span>
                         )
@@ -509,13 +648,18 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">Response::RoundPending</span> {
                     <span class="ident">current_rank</span>,
                     <span class="ident">number_of_players</span>,
-                    <span class="ident">seconds_remaining</span>
+                    <span class="ident">seconds_remaining</span>,
+                    <span class="ident">number_of_tells</span>,
+                    <span class="ident">tells_going_out</span>,
                 }) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">api_callback_context</span>.<span class="ident">context</span>.<span class="ident">send_command</span>(<span class="ident">ComponentCommand::Behavior</span>(<span class="ident">GameInterfaceEvent::UpdateStatus</span>(
-                        <span class="macro">format!</span>(<span class="string">&quot;Round starting in {} seconds! Ranked {} of {} players currently playing.&quot;</span>,
+                        <span class="macro">format!</span>(<span class="string">&quot;Round starting in {} seconds! Ranked {} of {}. Current tells: {}/{} ({}%) going out.&quot;</span>,
                             <span class="ident">seconds_remaining</span>,
                             <span class="ident">current_rank</span>,
-                            <span class="ident">number_of_players</span>
+                            <span class="ident">number_of_players</span>,
+                            <span class="ident">tells_going_out</span>,
+                            <span class="ident">number_of_tells</span>,
+                            <span class="ident">whole_percent</span>(<span class="ident">tells_going_out</span> <span class="kw">as</span> <span class="ident">f32</span> <span class="op">/</span> <span class="ident">number_of_tells</span> <span class="kw">as</span> <span class="ident">f32</span>)
                         )
                     )));
                 }
@@ -544,6 +688,16 @@
                 <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">send_api_request</span>(<span class="ident">Request::SetChoice</span>(<span class="ident">choice</span>)).<span class="kw">await</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">Response::ChoiceSet</span>(<span class="ident">choice</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="macro">log::info!</span>(<span class="string">&quot;Choice confirmed: {:?}&quot;</span>, <span class="ident">choice</span>)
+                    }
+                    <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="macro">log::error!</span>(<span class="string">&quot;Error sending request: {:?}&quot;</span>, <span class="ident">other</span>);
+                    }
+                }
+            }
+            <span class="ident">DatabaseCommand::SetTell</span>(<span class="ident">choice</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">send_api_request</span>(<span class="ident">Request::SetTell</span>(<span class="ident">choice</span>)).<span class="kw">await</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">Response::ChoiceSet</span>(<span class="ident">choice</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="macro">log::info!</span>(<span class="string">&quot;Tell confirmed: {:?}&quot;</span>, <span class="ident">choice</span>)
                     }
                     <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="macro">log::error!</span>(<span class="string">&quot;Error sending request: {:?}&quot;</span>, <span class="ident">other</span>);

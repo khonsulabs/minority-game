@@ -284,7 +284,7 @@
 <span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">stream::FuturesUnordered</span>, <span class="ident">StreamExt</span>};
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">header</span>, <span class="ident">server::conn::Http</span>, <span class="ident">Body</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>};
-<span class="kw">use</span> <span class="ident">minority_game_shared::happiness_as_whole_percent</span>;
+<span class="kw">use</span> <span class="ident">minority_game_shared::whole_percent</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">tera::Tera</span>;
 <span class="kw">use</span> <span class="ident">tower_http</span>::{<span class="ident">services::ServeDir</span>, <span class="ident">set_header::SetResponseHeaderLayer</span>};
@@ -532,7 +532,7 @@
         <span class="self">Self</span> {
             <span class="ident">id</span>,
             <span class="ident">rank</span>: <span class="ident">index</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="ident">happiness</span>: <span class="ident">happiness_as_whole_percent</span>(<span class="ident">player</span>.<span class="ident">happiness</span>),
+            <span class="ident">happiness</span>: <span class="ident">whole_percent</span>(<span class="ident">player</span>.<span class="ident">happiness</span>),
             <span class="ident">times_stayed_in</span>: <span class="ident">player</span>.<span class="ident">times_stayed_in</span>,
             <span class="ident">times_went_out</span>: <span class="ident">player</span>.<span class="ident">times_went_out</span>,
         }
