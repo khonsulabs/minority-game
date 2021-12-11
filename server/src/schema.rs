@@ -25,6 +25,8 @@ impl Schema for GameSchema {
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct Player {
     pub choice: Option<Choice>,
+    #[serde(default)]
+    pub tell: Option<Choice>,
     pub stats: PlayerStats,
 }
 
@@ -33,6 +35,8 @@ pub struct PlayerStats {
     pub happiness: f32,
     pub times_went_out: u32,
     pub times_stayed_in: u32,
+    pub times_lied: u32,
+    pub times_told_truth: u32,
 }
 
 impl Default for PlayerStats {
@@ -41,6 +45,8 @@ impl Default for PlayerStats {
             happiness: 0.5,
             times_went_out: 0,
             times_stayed_in: 0,
+            times_lied: 0,
+            times_told_truth: 0,
         }
     }
 }

@@ -7,6 +7,9 @@ pub enum Request {
     /// Set the current choice.
     #[cfg_attr(feature = "actionable-traits", actionable(protection = "none"))]
     SetChoice(Choice),
+    /// Set the current tell.
+    #[cfg_attr(feature = "actionable-traits", actionable(protection = "none"))]
+    SetTell(Choice),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -28,6 +31,8 @@ pub enum Response {
         seconds_remaining: u32,
         number_of_players: u32,
         current_rank: u32,
+        number_of_tells: u32,
+        tells_going_out: u32,
     },
 
     RoundComplete {
@@ -35,6 +40,8 @@ pub enum Response {
         happiness: f32,
         current_rank: u32,
         number_of_players: u32,
+        number_of_liars: u32,
+        number_of_tells: u32,
     },
 }
 
@@ -47,6 +54,6 @@ impl CustomApi for Api {
     type Response = Response;
 }
 
-pub fn happiness_as_whole_percent(happiness: f32) -> u32 {
+pub fn whole_percent(happiness: f32) -> u32 {
     (happiness * 100.).round() as u32
 }

@@ -11,7 +11,7 @@ use bonsaidb::{
 use cfg_if::cfg_if;
 use futures::{stream::FuturesUnordered, StreamExt};
 use hyper::{header, server::conn::Http, Body, Request, Response, StatusCode};
-use minority_game_shared::happiness_as_whole_percent;
+use minority_game_shared::whole_percent;
 use serde::{Deserialize, Serialize};
 use tera::Tera;
 use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
@@ -259,7 +259,7 @@ impl RankedPlayer {
         Self {
             id,
             rank: index as u32 + 1,
-            happiness: happiness_as_whole_percent(player.happiness),
+            happiness: whole_percent(player.happiness),
             times_stayed_in: player.times_stayed_in,
             times_went_out: player.times_went_out,
         }

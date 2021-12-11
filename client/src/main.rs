@@ -3,7 +3,7 @@ use std::time::Duration;
 use bonsaidb::client::Client;
 use cfg_if::cfg_if;
 use gooey::{
-    core::{Context, StyledWidget},
+    core::{figures::Size, Context, StyledWidget, WindowBuilder},
     widgets::{
         button::Button,
         component::{Behavior, Component, ComponentCommand, Content, EventMapper},
@@ -12,7 +12,7 @@ use gooey::{
     },
     App,
 };
-use minority_game_shared::{happiness_as_whole_percent, Api, Choice, Request, Response};
+use minority_game_shared::{whole_percent, Api, Choice, Request, Response};
 
 fn main() {
     // The user interface and database will be run separately, and flume
@@ -23,10 +23,13 @@ fn main() {
     // Spawn an async task that processes commands sent by `command_sender`.
     App::spawn(process_database_commands(command_receiver));
 
-    App::from_root(|storage|
-        // The root widget is a `Component` with our component behavior
-        // `Counter`.
-        Component::new(GameInterface::new(command_sender), storage))
+    App::from(
+        WindowBuilder::new(|storage|
+            // The root widget is a `Component` with our component behavior
+            // `Counter`.
+            Component::new(GameInterface::new(command_sender), storage))
+        .size(Size::new(512, 384)),
+    )
     // Register our custom component's transmogrifier.
     .with_component::<GameInterface>()
     // Run the app using the widget returned by the initializer.
@@ -62,28 +65,81 @@ impl Behavior for GameInterface {
     ) -> StyledWidget<Layout> {
         builder
             .with(
-                CounterWidgets::GoOut,
-                Button::new("Go Out", events.map(|_| GameInterfaceEvent::GoOutClicked)),
+                None,
+                Label::new("This is an adaption of the game theory game \"Minority Game\". Choose between staying in or going out. If more than 50% of the players go out, everyone who goes out will lose happiness because they have a bad time when everything is crowded. However, if it's not too crowed, the players who chose to go out will gain a significant amount of happiness. Those who choose to stay in will gravitate toward 50% happiness."),
                 WidgetLayout::build()
-                    .left(Dimension::zero())
-                    .top(Dimension::zero())
+                    .top(Dimension::exact(20.))
+                    .left(Dimension::exact(20.))
+                    .right(Dimension::exact(20.))
+                    .finish(),
+            )
+            .with(
+                None,
+                Label::new("Pick your choice:"),
+                WidgetLayout::build()
+                .bottom(Dimension::exact(100.))
+                    .left(Dimension::exact(20.))
+                    .finish(),
+            )
+            .with(
+                CounterWidgets::GoOut,
+                Button::new(
+                    "Go Out",
+                    events.map(|_| GameInterfaceEvent::ChoiceClicked(Choice::GoOut)),
+                ),
+                WidgetLayout::build()
+                    .left(Dimension::exact(200.))
+                    .bottom(Dimension::exact(100.))
                     .finish(),
             )
             .with(
                 CounterWidgets::StayIn,
-                Button::new("Stay In", events.map(|_| GameInterfaceEvent::StayInClicked)),
+                Button::new(
+                    "Stay In",
+                    events.map(|_| GameInterfaceEvent::ChoiceClicked(Choice::StayIn)),
+                ),
                 WidgetLayout::build()
-                    .top(Dimension::zero())
-                    .right(Dimension::zero())
+                    .left(Dimension::exact(250.))
+                    .bottom(Dimension::exact(100.))
+                    .finish(),
+            )
+            .with(
+                None,
+                Label::new("Pick your tell (Optional):"),
+                WidgetLayout::build()
+                    .bottom(Dimension::exact(60.))
+                    .left(Dimension::exact(20.))
+                    .finish(),
+            )
+            .with(
+                CounterWidgets::TellGoOut,
+                Button::new(
+                    "Go Out",
+                    events.map(|_| GameInterfaceEvent::TellClicked(Choice::GoOut)),
+                ),
+                WidgetLayout::build()
+                    .left(Dimension::exact(200.))
+                    .bottom(Dimension::exact(60.))
+                        .finish(),
+            )
+            .with(
+                CounterWidgets::TellStayIn,
+                Button::new(
+                    "Stay In",
+                    events.map(|_| GameInterfaceEvent::TellClicked(Choice::StayIn)),
+                ),
+                WidgetLayout::build()
+                .left(Dimension::exact(250.))
+                .bottom(Dimension::exact(60.))
                     .finish(),
             )
             .with(
                 CounterWidgets::Status,
                 Label::new("Connecting..."),
                 WidgetLayout::build()
-                    .bottom(Dimension::zero())
-                    .left(Dimension::zero())
-                    .right(Dimension::zero())
+                    .bottom(Dimension::exact(20.))
+                    .left(Dimension::exact(20.))
+                    .right(Dimension::exact(20.))
                     .finish(),
             )
             .finish()
@@ -104,17 +160,17 @@ impl Behavior for GameInterface {
         context: &Context<Component<Self>>,
     ) {
         match event {
-            GameInterfaceEvent::GoOutClicked => {
+            GameInterfaceEvent::ChoiceClicked(choice) => {
                 let _ = component
                     .behavior
                     .command_sender
-                    .send(DatabaseCommand::SetChoice(Choice::GoOut));
+                    .send(DatabaseCommand::SetChoice(choice));
             }
-            GameInterfaceEvent::StayInClicked => {
+            GameInterfaceEvent::TellClicked(choice) => {
                 let _ = component
                     .behavior
                     .command_sender
-                    .send(DatabaseCommand::SetChoice(Choice::StayIn));
+                    .send(DatabaseCommand::SetTell(choice));
             }
             GameInterfaceEvent::UpdateStatus(status) => {
                 let label = component
@@ -134,12 +190,14 @@ enum CounterWidgets {
     GoOut,
     StayIn,
     Status,
+    TellGoOut,
+    TellStayIn,
 }
 
 #[derive(Debug)]
 enum GameInterfaceEvent {
-    GoOutClicked,
-    StayInClicked,
+    ChoiceClicked(Choice),
+    TellClicked(Choice),
     UpdateStatus(String),
 }
 
@@ -147,8 +205,8 @@ enum GameInterfaceEvent {
 enum DatabaseCommand {
     /// Initializes the worker with a context, which
     Initialize(DatabaseContext),
-    /// Increment the counter.
     SetChoice(Choice),
+    SetTell(Choice),
 }
 
 /// A context provides the information necessary to communicate with the user
@@ -204,7 +262,7 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                     let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
                         format!("Welcome {}! Current happiness: {}",
                             player_id,
-                            happiness_as_whole_percent(happiness),
+                            whole_percent(happiness),
                         )
                     )));
                 }
@@ -214,15 +272,19 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                     happiness,
                     current_rank,
                     number_of_players,
+                    number_of_liars,
+                    number_of_tells
                 }) => {
                     let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
-                        format!("You {}! Current happiness: {}%. Ranked {} of {} players in the last round.",
+                        format!("You {}! {}/{} players lied about their intentions. Current happiness: {}%. Ranked {} of {} players in the last round.",
                             if won {
                                 "won"
                             } else {
                                 "lost"
                             },
-                            happiness_as_whole_percent(happiness),
+                            number_of_liars,
+                            number_of_tells,
+                            whole_percent(happiness),
                             current_rank,
                             number_of_players
                         )
@@ -231,13 +293,18 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                 Ok(Response::RoundPending {
                     current_rank,
                     number_of_players,
-                    seconds_remaining
+                    seconds_remaining,
+                    number_of_tells,
+                    tells_going_out,
                 }) => {
                     let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
-                        format!("Round starting in {} seconds! Ranked {} of {} players currently playing.",
+                        format!("Round starting in {} seconds! Ranked {} of {}. Current tells: {}/{} ({}%) going out.",
                             seconds_remaining,
                             current_rank,
-                            number_of_players
+                            number_of_players,
+                            tells_going_out,
+                            number_of_tells,
+                            whole_percent(tells_going_out as f32 / number_of_tells as f32)
                         )
                     )));
                 }
@@ -266,6 +333,16 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                 match client.send_api_request(Request::SetChoice(choice)).await {
                     Ok(Response::ChoiceSet(choice)) => {
                         log::info!("Choice confirmed: {:?}", choice)
+                    }
+                    other => {
+                        log::error!("Error sending request: {:?}", other);
+                    }
+                }
+            }
+            DatabaseCommand::SetTell(choice) => {
+                match client.send_api_request(Request::SetTell(choice)).await {
+                    Ok(Response::ChoiceSet(choice)) => {
+                        log::info!("Tell confirmed: {:?}", choice)
                     }
                     other => {
                         log::error!("Error sending request: {:?}", other);

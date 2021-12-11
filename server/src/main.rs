@@ -17,7 +17,9 @@ use bonsaidb::{
         CustomApiDispatcher, CustomServer, DefaultPermissions, ServerDatabase,
     },
 };
-use minority_game_shared::{Api, Choice, Request, RequestDispatcher, Response, SetChoiceHandler};
+use minority_game_shared::{
+    Api, Choice, Request, RequestDispatcher, Response, SetChoiceHandler, SetTellHandler,
+};
 use rand::{thread_rng, Rng};
 use structopt::StructOpt;
 use tokio::time::Instant;
@@ -177,6 +179,28 @@ impl SetChoiceHandler for ApiDispatcher {
     }
 }
 
+#[actionable::async_trait]
+impl SetTellHandler for ApiDispatcher {
+    async fn handle(
+        &self,
+        _permissions: &actionable::Permissions,
+        tell: Choice,
+    ) -> Result<Response, BackendError<Infallible>> {
+        println!("Returning current counter value.");
+        let db = self.server.game_database().await?;
+
+        let mut player = self.client.client_data().await;
+        let player = player
+            .as_mut()
+            .expect("all connected clients should have a player record");
+
+        player.contents.tell = Some(tell);
+        player.update(&db).await?;
+
+        Ok(Response::ChoiceSet(tell))
+    }
+}
+
 #[async_trait]
 trait CustomServerExt {
     async fn game_database(&self) -> Result<ServerDatabase<Game>, bonsaidb::core::Error>;
@@ -226,6 +250,15 @@ async fn send_status_update(
 
     sort_players(&mut players[..]);
 
+    let (tells_going_out, number_of_tells) = players
+        .iter()
+        .map(|player| match player.contents.tell {
+            Some(Choice::GoOut) => (1, 1),
+            Some(Choice::StayIn) => (0, 1),
+            None => (0, 0),
+        })
+        .fold((0, 0), |acc, player| (acc.0 + player.0, acc.1 + player.1));
+
     let seconds_remaining = seconds_remaining.unwrap_or(SECONDS_PER_ROUND);
 
     for (index, player) in players.iter().enumerate() {
@@ -234,6 +267,8 @@ async fn send_status_update(
             seconds_remaining,
             number_of_players: players.len() as u32,
             current_rank: index as u32 + 1,
+            tells_going_out,
+            number_of_tells,
         })));
     }
 
@@ -275,6 +310,17 @@ async fn play_game(
         }
     }
 
+    let (number_of_liars, number_of_tells) = players
+        .iter()
+        .map(|player| {
+            if player.contents.tell.is_some() && player.contents.choice != player.contents.tell {
+                (1, 1)
+            } else {
+                (0, if player.contents.tell.is_some() { 1 } else { 0 })
+            }
+        })
+        .fold((0, 0), |acc, player| (acc.0 + player.0, acc.1 + player.1));
+
     let had_fun = going_out <= staying_in;
     for player in &mut players {
         match player.contents.choice.take().unwrap() {
@@ -295,6 +341,7 @@ async fn play_game(
             }
         }
 
+        player.contents.tell = None;
         player.update(db).await?;
     }
 
@@ -313,6 +360,8 @@ async fn play_game(
             happiness: player.contents.stats.happiness,
             current_rank: index as u32 + 1,
             number_of_players,
+            number_of_tells,
+            number_of_liars,
         })));
         client.set_client_data(player).await;
     }
