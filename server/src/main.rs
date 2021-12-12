@@ -5,11 +5,13 @@ use std::{
     time::Duration,
 };
 
+use actionable::{Action, ActionNameList, Permissions, ResourceName, Statement};
 use bonsaidb::{
     core::{
         async_trait::async_trait,
         connection::StorageConnection,
         custom_api::Infallible,
+        permissions::bonsai::{BonsaiAction, ServerAction},
         schema::{Collection, CollectionDocument},
     },
     server::{
@@ -47,7 +49,15 @@ async fn main() -> anyhow::Result<()> {
         Path::new("minority-game.bonsaidb"),
         Configuration {
             server_name: String::from("minority-game.gooey.rs"),
-            default_permissions: DefaultPermissions::AllowAll,
+            default_permissions: DefaultPermissions::Permissions(Permissions::from(vec![
+                Statement {
+                    resources: vec![ResourceName::any()],
+                    actions: ActionNameList::List(vec![BonsaiAction::Server(
+                        ServerAction::Connect,
+                    )
+                    .name()]),
+                },
+            ])),
             ..Configuration::default()
         },
     )
