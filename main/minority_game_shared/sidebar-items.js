@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Api",""],["Choice",""],["Request",""],["Response",""]],"fn":[["whole_percent",""]]});
+initSidebarItems({"enum":[["Api","The [`CustomApi`] for the game."],["Choice","A player’s choice in the game."],["Request","A game network request."],["Response","A game network response."]],"fn":[["whole_percent","Converts a `percent` to its nearest whole number."]]});

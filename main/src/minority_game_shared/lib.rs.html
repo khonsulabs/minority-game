@@ -57,9 +57,17 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bonsaidb::core::custom_api</span>::{<span class="ident">CustomApi</span>, <span class="ident">Infallible</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
+<span class="doccomment">/// A game network request.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actionable-traits&quot;</span>, <span class="ident">derive</span>(<span class="ident">actionable::Actionable</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Request</span> {
@@ -71,21 +79,23 @@
     <span class="ident">SetTell</span>(<span class="ident">Choice</span>),
 }
 
+<span class="doccomment">/// A player&#39;s choice in the game.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Choice</span> {
     <span class="ident">GoOut</span>,
     <span class="ident">StayIn</span>,
 }
 
+<span class="doccomment">/// A game network response.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Response</span> {
-    <span class="ident">Welcome</span> {
-        <span class="ident">player_id</span>: <span class="ident">u64</span>,
-        <span class="ident">happiness</span>: <span class="ident">f32</span>,
-    },
+    <span class="doccomment">/// The server has set up our player record.</span>
+    <span class="ident">Welcome</span> { <span class="ident">player_id</span>: <span class="ident">u64</span>, <span class="ident">happiness</span>: <span class="ident">f32</span> },
 
+    <span class="doccomment">/// Our choice has been set.</span>
     <span class="ident">ChoiceSet</span>(<span class="ident">Choice</span>),
 
+    <span class="doccomment">/// A round is pending.</span>
     <span class="ident">RoundPending</span> {
         <span class="ident">seconds_remaining</span>: <span class="ident">u32</span>,
         <span class="ident">number_of_players</span>: <span class="ident">u32</span>,
@@ -94,7 +104,9 @@
         <span class="ident">tells_going_out</span>: <span class="ident">u32</span>,
     },
 
+    <span class="doccomment">/// A round has finished.</span>
     <span class="ident">RoundComplete</span> {
+        <span class="doccomment">/// The player&#39;s happiness has gone up this round.</span>
         <span class="ident">won</span>: <span class="ident">bool</span>,
         <span class="ident">happiness</span>: <span class="ident">f32</span>,
         <span class="ident">current_rank</span>: <span class="ident">u32</span>,
@@ -104,6 +116,7 @@
     },
 }
 
+<span class="doccomment">/// The [`CustomApi`] for the game.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Api</span> {}
 
@@ -113,8 +126,9 @@
     <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">whole_percent</span>(<span class="ident">happiness</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-    (<span class="ident">happiness</span> <span class="op">*</span> <span class="number">100.</span>).<span class="ident">round</span>() <span class="kw">as</span> <span class="ident">u32</span>
+<span class="doccomment">/// Converts a `percent` to its nearest whole number.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">whole_percent</span>(<span class="ident">percent</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    (<span class="ident">percent</span> <span class="op">*</span> <span class="number">100.</span>).<span class="ident">round</span>() <span class="kw">as</span> <span class="ident">u32</span>
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="minority_game_shared" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

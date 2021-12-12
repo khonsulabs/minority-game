@@ -411,6 +411,14 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">cmp::Ordering</span>,
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
@@ -418,11 +426,13 @@
     <span class="ident">time::Duration</span>,
 };
 
+<span class="kw">use</span> <span class="ident">actionable</span>::{<span class="ident">Action</span>, <span class="ident">ActionNameList</span>, <span class="ident">Permissions</span>, <span class="ident">ResourceName</span>, <span class="ident">Statement</span>};
 <span class="kw">use</span> <span class="ident">bonsaidb</span>::{
     <span class="ident">core</span>::{
         <span class="ident">async_trait::async_trait</span>,
         <span class="ident">connection::StorageConnection</span>,
         <span class="ident">custom_api::Infallible</span>,
+        <span class="ident">permissions::bonsai</span>::{<span class="ident">BonsaiAction</span>, <span class="ident">ServerAction</span>},
         <span class="ident">schema</span>::{<span class="ident">Collection</span>, <span class="ident">CollectionDocument</span>},
     },
     <span class="ident">server</span>::{
@@ -460,7 +470,15 @@
         <span class="ident">Path::new</span>(<span class="string">&quot;minority-game.bonsaidb&quot;</span>),
         <span class="ident">Configuration</span> {
             <span class="ident">server_name</span>: <span class="ident">String::from</span>(<span class="string">&quot;minority-game.gooey.rs&quot;</span>),
-            <span class="ident">default_permissions</span>: <span class="ident">DefaultPermissions::AllowAll</span>,
+            <span class="ident">default_permissions</span>: <span class="ident">DefaultPermissions::Permissions</span>(<span class="ident">Permissions::from</span>(<span class="macro">vec!</span>[
+                <span class="ident">Statement</span> {
+                    <span class="ident">resources</span>: <span class="macro">vec!</span>[<span class="ident">ResourceName::any</span>()],
+                    <span class="ident">actions</span>: <span class="ident">ActionNameList::List</span>(<span class="macro">vec!</span>[<span class="ident">BonsaiAction::Server</span>(
+                        <span class="ident">ServerAction::Connect</span>,
+                    )
+                    .<span class="ident">name</span>()]),
+                },
+            ])),
             ..<span class="ident">Configuration::default</span>()
         },
     )
@@ -577,7 +595,6 @@
         <span class="ident">_permissions</span>: <span class="kw-2">&amp;</span><span class="ident">actionable::Permissions</span>,
         <span class="ident">choice</span>: <span class="ident">Choice</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">BackendError</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">println!</span>(<span class="string">&quot;Returning current counter value.&quot;</span>);
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">player</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">client_data</span>().<span class="kw">await</span>;
@@ -599,7 +616,6 @@
         <span class="ident">_permissions</span>: <span class="kw-2">&amp;</span><span class="ident">actionable::Permissions</span>,
         <span class="ident">tell</span>: <span class="ident">Choice</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">BackendError</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">println!</span>(<span class="string">&quot;Returning current counter value.&quot;</span>);
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">player</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">client_data</span>().<span class="kw">await</span>;
