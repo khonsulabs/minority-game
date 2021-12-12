@@ -174,7 +174,6 @@ impl SetChoiceHandler for ApiDispatcher {
         _permissions: &actionable::Permissions,
         choice: Choice,
     ) -> Result<Response, BackendError<Infallible>> {
-        println!("Returning current counter value.");
         let db = self.server.game_database().await?;
 
         let mut player = self.client.client_data().await;
@@ -196,7 +195,6 @@ impl SetTellHandler for ApiDispatcher {
         _permissions: &actionable::Permissions,
         tell: Choice,
     ) -> Result<Response, BackendError<Infallible>> {
-        println!("Returning current counter value.");
         let db = self.server.game_database().await?;
 
         let mut player = self.client.client_data().await;

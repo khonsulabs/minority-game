@@ -3,7 +3,7 @@ name = "minority-game-server"
 version = "0.1.0"
 authors = ["Jonathan Johnson <jon@khonsulabs.com>"]
 edition = "2021"
-description = "The server portion of a simple counter example."
+description = "The game server for Minority Game"
 license = "MIT OR Apache-2.0"
 
 [features]

@@ -24,11 +24,9 @@ fn main() {
     App::spawn(process_database_commands(command_receiver));
 
     App::from(
-        WindowBuilder::new(|storage|
-            // The root widget is a `Component` with our component behavior
-            // `Counter`.
-            Component::new(GameInterface::new(command_sender), storage))
-        .size(Size::new(512, 384)),
+        WindowBuilder::new(|storage| Component::new(GameInterface::new(command_sender), storage))
+            .size(Size::new(512, 384))
+            .title("Minority Game - BonsaiDb + Gooey Demo"),
     )
     // Register our custom component's transmogrifier.
     .with_component::<GameInterface>()
@@ -36,7 +34,6 @@ fn main() {
     .run()
 }
 
-/// The state of the `Counter` component.
 #[derive(Debug)]
 struct GameInterface {
     command_sender: flume::Sender<DatabaseCommand>,
@@ -56,7 +53,7 @@ impl Behavior for GameInterface {
     /// The event enum that child widget events will send.
     type Event = GameInterfaceEvent;
     /// An enum of child widgets.
-    type Widgets = CounterWidgets;
+    type Widgets = GameWidgets;
 
     fn build_content(
         &mut self,
@@ -82,7 +79,7 @@ impl Behavior for GameInterface {
                     .finish(),
             )
             .with(
-                CounterWidgets::GoOut,
+                GameWidgets::GoOut,
                 Button::new(
                     "Go Out",
                     events.map(|_| GameInterfaceEvent::ChoiceClicked(Choice::GoOut)),
@@ -93,7 +90,7 @@ impl Behavior for GameInterface {
                     .finish(),
             )
             .with(
-                CounterWidgets::StayIn,
+                GameWidgets::StayIn,
                 Button::new(
                     "Stay In",
                     events.map(|_| GameInterfaceEvent::ChoiceClicked(Choice::StayIn)),
@@ -112,7 +109,7 @@ impl Behavior for GameInterface {
                     .finish(),
             )
             .with(
-                CounterWidgets::TellGoOut,
+                GameWidgets::TellGoOut,
                 Button::new(
                     "Go Out",
                     events.map(|_| GameInterfaceEvent::TellClicked(Choice::GoOut)),
@@ -123,7 +120,7 @@ impl Behavior for GameInterface {
                         .finish(),
             )
             .with(
-                CounterWidgets::TellStayIn,
+                GameWidgets::TellStayIn,
                 Button::new(
                     "Stay In",
                     events.map(|_| GameInterfaceEvent::TellClicked(Choice::StayIn)),
@@ -134,7 +131,7 @@ impl Behavior for GameInterface {
                     .finish(),
             )
             .with(
-                CounterWidgets::Status,
+                GameWidgets::Status,
                 Label::new("Connecting..."),
                 WidgetLayout::build()
                     .bottom(Dimension::exact(20.))
@@ -174,7 +171,7 @@ impl Behavior for GameInterface {
             }
             GameInterfaceEvent::UpdateStatus(status) => {
                 let label = component
-                    .widget_state(&CounterWidgets::Status, context)
+                    .widget_state(&GameWidgets::Status, context)
                     .unwrap();
                 let mut label = label.lock::<Label>(context.frontend()).unwrap();
                 label.widget.set_label(status, &label.context);
@@ -186,7 +183,7 @@ impl Behavior for GameInterface {
 /// This enum identifies widgets that you want to send commands to. If a widget
 /// doesn't need to receive commands, it doesn't need an entry in this enum.
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
-enum CounterWidgets {
+enum GameWidgets {
     GoOut,
     StayIn,
     Status,
