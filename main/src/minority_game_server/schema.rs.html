@@ -92,9 +92,6 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bonsaidb::core::schema</span>::{
     <span class="ident">Collection</span>, <span class="ident">CollectionDocument</span>, <span class="ident">CollectionName</span>, <span class="ident">CollectionView</span>, <span class="ident">InvalidNameError</span>, <span class="ident">MapResult</span>,
     <span class="ident">Name</span>, <span class="ident">Schema</span>, <span class="ident">SchemaName</span>, <span class="ident">Schematic</span>,
@@ -108,11 +105,11 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GameSchema</span> {}
 
 <span class="kw">impl</span> <span class="ident">Schema</span> <span class="kw">for</span> <span class="ident">GameSchema</span> {
-    <span class="kw">fn</span> <span class="ident">schema_name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SchemaName</span>, <span class="ident">InvalidNameError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">schema_name</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SchemaName</span>, <span class="ident">InvalidNameError</span><span class="op">&gt;</span> {
         <span class="ident">SchemaName::new</span>(<span class="ident">AUTHORITY</span>, <span class="string">&quot;game&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">define_collections</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Schematic</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">define_collections</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Schematic</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span> {
         <span class="ident">schema</span>.<span class="ident">define_collection</span>::<span class="op">&lt;</span><span class="ident">Player</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -137,7 +134,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PlayerStats</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">happiness</span>: <span class="number">0.5</span>,
             <span class="ident">times_went_out</span>: <span class="number">0</span>,
@@ -149,18 +146,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PlayerStats</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">score</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">score</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">let</span> <span class="ident">total_games</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">times_stayed_in</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">times_went_out</span>;
         (<span class="self">self</span>.<span class="ident">happiness</span> <span class="op">*</span> <span class="ident">total_games</span> <span class="kw">as</span> <span class="ident">f32</span>) <span class="kw">as</span> <span class="ident">u32</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Collection</span> <span class="kw">for</span> <span class="ident">Player</span> {
-    <span class="kw">fn</span> <span class="ident">collection_name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CollectionName</span>, <span class="ident">InvalidNameError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">collection_name</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CollectionName</span>, <span class="ident">InvalidNameError</span><span class="op">&gt;</span> {
         <span class="ident">CollectionName::new</span>(<span class="string">&quot;minority-game&quot;</span>, <span class="string">&quot;player&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">define_views</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Schematic</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">define_views</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Schematic</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span> {
         <span class="ident">schema</span>.<span class="ident">define_view</span>(<span class="ident">PlayerByScore</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
@@ -174,22 +171,19 @@
     <span class="kw">type</span> <span class="ident">Key</span> <span class="op">=</span> <span class="ident">u32</span>;
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">PlayerStats</span>;
 
-    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="number">2</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Name</span>, <span class="ident">InvalidNameError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Name</span>, <span class="ident">InvalidNameError</span><span class="op">&gt;</span> {
         <span class="ident">Name::new</span>(<span class="string">&quot;by-score&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">map</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">player</span>: <span class="ident">CollectionDocument</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Collection</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MapResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Key</span>, <span class="ident"><span class="self">Self</span>::Value</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">player</span>.<span class="ident">emit_key_and_value</span>(
-            <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">score</span>(),
-            <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">clone</span>(),
-        )])
+    ) -&gt; <span class="ident">MapResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Key</span>, <span class="ident"><span class="self">Self</span>::Value</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">player</span>.<span class="ident">emit_key_and_value</span>(<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">score</span>(), <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">clone</span>()))
     }
 }
 </code></pre></div>

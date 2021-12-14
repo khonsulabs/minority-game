@@ -311,7 +311,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WebServer</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server</span>: <span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server</span>: <span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">templates</span> <span class="op">=</span> <span class="ident">Tera::default</span>();
         <span class="ident">templates</span>
             .<span class="ident">add_raw_template</span>(<span class="string">&quot;stats&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">stats_template</span>().<span class="kw">await</span>)
@@ -330,7 +330,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">connection</span>: <span class="ident">S</span>,
         <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">S</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Http::new</span>()
             .<span class="ident">serve_connection</span>(<span class="ident">connection</span>, <span class="self">self</span>.<span class="ident">router</span>(<span class="ident">peer</span>))
             .<span class="ident">with_upgrades</span>()
@@ -344,7 +344,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WebServer</span> {
-    <span class="kw">fn</span> <span class="ident">webapp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Router</span> {
+    <span class="kw">fn</span> <span class="ident">webapp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>) -&gt; <span class="ident">Router</span> {
         <span class="ident">Router::new</span>()
             .<span class="ident">nest</span>(
                 <span class="string">&quot;/pkg&quot;</span>,
@@ -382,12 +382,12 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">router</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Router</span> {
+    <span class="kw">fn</span> <span class="ident">router</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>) -&gt; <span class="ident">Router</span> {
         <span class="self">self</span>.<span class="ident">webapp</span>(<span class="ident">peer</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">router</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Router</span> {
+    <span class="kw">fn</span> <span class="ident">router</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">Peer</span>) -&gt; <span class="ident">Router</span> {
         <span class="kw">if</span> <span class="ident">peer</span>.<span class="ident">secure</span> {
             <span class="self">self</span>.<span class="ident">webapp</span>(<span class="ident">peer</span>)
         } <span class="kw">else</span> {
@@ -402,7 +402,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">redirect_to_https</span>(
     <span class="ident">server</span>: <span class="ident">extract::Extension</span><span class="op">&lt;</span><span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">req</span>: <span class="ident">hyper::Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hyper::Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">hyper::Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">hyper::Response::new</span>(<span class="ident">Body::empty</span>());
     <span class="kw-2">*</span><span class="ident">response</span>.<span class="ident">status_mut</span>() <span class="op">=</span> <span class="ident">hyper::StatusCode::PERMANENT_REDIRECT</span>;
@@ -417,12 +417,12 @@
     <span class="ident">server</span>: <span class="ident">extract::Extension</span><span class="op">&lt;</span><span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">peer</span>: <span class="ident">extract::Extension</span><span class="op">&lt;</span><span class="ident">Peer</span><span class="op">&gt;</span>,
     <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="ident">server</span>.<span class="ident">upgrade_websocket</span>(<span class="ident">peer</span>.<span class="ident">address</span>, <span class="ident">req</span>).<span class="kw">await</span>
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unused_async</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Html</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">index</span>() -&gt; <span class="ident">Html</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">file_contents</span> <span class="op">=</span> {
         <span class="macro">cfg_if!</span> {
             <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span> {
@@ -439,7 +439,7 @@
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unused_async</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">spa_index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Html</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">spa_index</span>() -&gt; <span class="ident">Html</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">file_contents</span> <span class="op">=</span> {
         <span class="macro">cfg_if!</span> {
             <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span> {
@@ -455,7 +455,7 @@
     <span class="ident">Html::from</span>(<span class="ident">file_contents</span>)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stats_template</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stats_template</span>() -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="macro">cfg_if!</span> {
         <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span> {
             <span class="ident">Cow::Owned</span>(<span class="ident">tokio::fs::read_to_string</span>(<span class="string">&quot;server/src/stats.tera.html&quot;</span>)
@@ -470,7 +470,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stats</span>(
     <span class="ident">server</span>: <span class="ident">extract::Extension</span><span class="op">&lt;</span><span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">templates</span>: <span class="ident">extract::Extension</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Tera</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Html</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Html</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_players</span> <span class="op">=</span> <span class="ident">server</span>
         .<span class="ident">connected_clients</span>()
         .<span class="kw">await</span>
@@ -528,7 +528,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RankedPlayer</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_player_stats</span>(<span class="ident">player</span>: <span class="kw-2">&amp;</span><span class="ident">PlayerStats</span>, <span class="ident">id</span>: <span class="ident">u64</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_player_stats</span>(<span class="ident">player</span>: <span class="kw-2">&amp;</span><span class="ident">PlayerStats</span>, <span class="ident">id</span>: <span class="ident">u64</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">id</span>,
             <span class="ident">rank</span>: <span class="ident">index</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">1</span>,

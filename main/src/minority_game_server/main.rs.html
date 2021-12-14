@@ -463,7 +463,7 @@
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>), <span class="ident">allow</span>(<span class="ident">unused_mut</span>))]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span><span class="ident">::from_args</span>();
 
     <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">CustomServer</span>::<span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span><span class="ident">::open</span>(
@@ -485,7 +485,7 @@
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">command</span> {
-        <span class="ident">Command::Certificate</span>(<span class="ident">cert_command</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Command::Certificate</span>(<span class="ident">cert_command</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">is_installing_self_signed</span> <span class="op">=</span> <span class="macro">matches!</span>(
                 <span class="ident">cert_command</span>,
                 <span class="ident">bonsaidb::server::cli::certificate::Command::InstallSelfSigned</span> { .. }
@@ -501,7 +501,7 @@
                 }
             }
         }
-        <span class="ident">Command::Serve</span>(<span class="kw-2">mut</span> <span class="ident">serve_command</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Command::Serve</span>(<span class="kw-2">mut</span> <span class="ident">serve_command</span>) =&gt; {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
             <span class="kw">if</span> <span class="ident">serve_command</span>.<span class="ident">http_port</span>.<span class="ident">is_none</span>() {
                 <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">Ipv6Addr</span>, <span class="ident">SocketAddr</span>, <span class="ident">SocketAddrV6</span>};
@@ -550,7 +550,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">client_connected</span>(
         <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">CustomServer</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionHandling</span> {
+    ) -&gt; <span class="ident">ConnectionHandling</span> {
         <span class="macro">log::info!</span>(
             <span class="string">&quot;{:?} client connected from {:?}&quot;</span>,
             <span class="ident">client</span>.<span class="ident">transport</span>(),
@@ -568,7 +568,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CustomApiDispatcher</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApiDispatcher</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>, <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>, <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ApiDispatcher</span> {
             <span class="ident">server</span>: <span class="ident">server</span>.<span class="ident">clone</span>(),
             <span class="ident">client</span>: <span class="ident">client</span>.<span class="ident">clone</span>(),
@@ -594,7 +594,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_permissions</span>: <span class="kw-2">&amp;</span><span class="ident">actionable::Permissions</span>,
         <span class="ident">choice</span>: <span class="ident">Choice</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">BackendError</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">BackendError</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">player</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">client_data</span>().<span class="kw">await</span>;
@@ -615,7 +615,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_permissions</span>: <span class="kw-2">&amp;</span><span class="ident">actionable::Permissions</span>,
         <span class="ident">tell</span>: <span class="ident">Choice</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">BackendError</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span>, <span class="ident">BackendError</span><span class="op">&lt;</span><span class="ident">Infallible</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">player</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">client_data</span>().<span class="kw">await</span>;
@@ -632,17 +632,17 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">trait</span> <span class="ident">CustomServerExt</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">game_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerDatabase</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>, <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">game_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerDatabase</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>, <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span>;
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">CustomServerExt</span> <span class="kw">for</span> <span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">game_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerDatabase</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>, <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">game_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerDatabase</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>, <span class="ident">bonsaidb::core::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">database</span>::<span class="op">&lt;</span><span class="ident">GameSchema</span><span class="op">&gt;</span>(<span class="ident">DATABASE_NAME</span>).<span class="kw">await</span>
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">game_loop</span>(<span class="ident">server</span>: <span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bonsaidb::server::Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">game_loop</span>(<span class="ident">server</span>: <span class="ident">CustomServer</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">bonsaidb::server::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_iteration</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">GameState::Idle</span>;
     <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -653,10 +653,10 @@
         <span class="kw">let</span> <span class="ident">clients</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">connected_clients</span>().<span class="kw">await</span>;
 
         <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">GameState::Idle</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">send_status_update</span>(<span class="kw-2">&amp;</span><span class="ident">clients</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">GameState::Idle</span> =&gt; <span class="ident">send_status_update</span>(<span class="kw-2">&amp;</span><span class="ident">clients</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>,
             <span class="ident">GameState::Pending</span> {
                 <span class="kw-2">mut</span> <span class="ident">seconds_remaining</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">if</span> <span class="ident">seconds_remaining</span> <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="ident">seconds_remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">send_status_update</span>(<span class="kw-2">&amp;</span><span class="ident">clients</span>, <span class="prelude-val">Some</span>(<span class="ident">seconds_remaining</span>)).<span class="kw">await</span><span class="question-mark">?</span>
@@ -671,7 +671,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_status_update</span>(
     <span class="ident">clients</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>],
     <span class="ident">seconds_remaining</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GameState</span>, <span class="ident">bonsaidb::server::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GameState</span>, <span class="ident">bonsaidb::server::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">players</span>, <span class="ident">clients_by_player_id</span>) <span class="op">=</span> <span class="ident">collect_players</span>(<span class="ident">clients</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="ident">players</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">GameState::Idle</span>);
@@ -682,9 +682,9 @@
     <span class="kw">let</span> (<span class="ident">tells_going_out</span>, <span class="ident">number_of_tells</span>) <span class="op">=</span> <span class="ident">players</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">player</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">tell</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Choice::GoOut</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">Choice::StayIn</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>, <span class="number">1</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>, <span class="number">0</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">Choice::GoOut</span>) =&gt; (<span class="number">1</span>, <span class="number">1</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">Choice::StayIn</span>) =&gt; (<span class="number">0</span>, <span class="number">1</span>),
+            <span class="prelude-val">None</span> =&gt; (<span class="number">0</span>, <span class="number">0</span>),
         })
         .<span class="ident">fold</span>((<span class="number">0</span>, <span class="number">0</span>), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">player</span><span class="op">|</span> (<span class="ident">acc</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">player</span>.<span class="number">0</span>, <span class="ident">acc</span>.<span class="number">1</span> <span class="op">+</span> <span class="ident">player</span>.<span class="number">1</span>));
 
@@ -707,7 +707,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">play_game</span>(
     <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDatabase</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>,
     <span class="ident">clients</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GameState</span>, <span class="ident">bonsaidb::server::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GameState</span>, <span class="ident">bonsaidb::server::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">players</span>, <span class="ident">clients_by_player_id</span>) <span class="op">=</span> <span class="ident">collect_players</span>(<span class="ident">clients</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="ident">players</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">GameState::Idle</span>);
@@ -718,11 +718,11 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">staying_in</span> <span class="op">=</span> <span class="number">0_u32</span>;
     <span class="kw">for</span> <span class="ident">player</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">players</span> {
         <span class="kw">match</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">choice</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">Choice::GoOut</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Choice::GoOut</span> =&gt; {
                 <span class="ident">going_out_player_ids</span>.<span class="ident">insert</span>(<span class="ident">player</span>.<span class="ident">id</span>);
                 <span class="ident">going_out</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="ident">Choice::StayIn</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Choice::StayIn</span> =&gt; {
                 <span class="ident">staying_in</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
         }
@@ -753,7 +753,7 @@
     <span class="kw">let</span> <span class="ident">had_fun</span> <span class="op">=</span> <span class="ident">going_out</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">staying_in</span>;
     <span class="kw">for</span> <span class="ident">player</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">players</span> {
         <span class="kw">match</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">choice</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>() {
-            <span class="ident">Choice::GoOut</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Choice::GoOut</span> =&gt; {
                 <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">times_went_out</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="kw">if</span> <span class="ident">had_fun</span> {
                     <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="op">=</span>
@@ -762,7 +762,7 @@
                     <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">TOO_BUSY_HAPPINESS_MULTIPLIER</span>;
                 }
             }
-            <span class="ident">Choice::StayIn</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Choice::StayIn</span> =&gt; {
                 <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">times_stayed_in</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span> <span class="op">=</span> (<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>
                     <span class="op">+</span> (<span class="number">0.5</span> <span class="op">-</span> <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">happiness</span>) <span class="op">*</span> <span class="ident">STAYED_IN_MULTIPLIER</span>)
@@ -805,7 +805,7 @@
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_players</span>(
     <span class="ident">clients</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>
     (
         <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CollectionDocument</span><span class="op">&lt;</span><span class="ident">Player</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">ConnectedClient</span><span class="op">&lt;</span><span class="ident">Game</span><span class="op">&gt;</span><span class="op">&gt;</span>,
