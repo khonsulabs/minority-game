@@ -89,9 +89,6 @@ impl CollectionView for PlayerByScore {
         &self,
         player: CollectionDocument<Self::Collection>,
     ) -> MapResult<Self::Key, Self::Value> {
-        Ok(vec![player.emit_key_and_value(
-            player.contents.stats.score(),
-            player.contents.stats.clone(),
-        )])
+        Ok(player.emit_key_and_value(player.contents.stats.score(), player.contents.stats.clone()))
     }
 }
