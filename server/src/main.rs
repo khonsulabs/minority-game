@@ -1,7 +1,6 @@
 use std::{
     cmp::Ordering,
     collections::{HashMap, HashSet},
-    path::Path,
     time::Duration,
 };
 
@@ -14,16 +13,17 @@ use bonsaidb::{
         permissions::bonsai::{BonsaiAction, ServerAction},
         schema::{Collection, CollectionDocument},
     },
+    local::config::Builder,
     server::{
-        cli::Command, Backend, BackendError, Configuration, ConnectedClient, ConnectionHandling,
-        CustomApiDispatcher, CustomServer, DefaultPermissions, ServerDatabase,
+        cli::Command, Backend, BackendError, ConnectedClient, ConnectionHandling,
+        CustomApiDispatcher, CustomServer, ServerConfiguration, ServerDatabase,
     },
 };
+use clap::Parser;
 use minority_game_shared::{
     Api, Choice, Request, RequestDispatcher, Response, SetChoiceHandler, SetTellHandler,
 };
 use rand::{thread_rng, Rng};
-use structopt::StructOpt;
 use tokio::time::Instant;
 
 use crate::{
@@ -43,23 +43,17 @@ const STAYED_IN_MULTIPLIER: f32 = 0.2;
 #[tokio::main]
 #[cfg_attr(not(debug_assertions), allow(unused_mut))]
 async fn main() -> anyhow::Result<()> {
-    let command = Command::<Game>::from_args();
+    let command = Command::<Game>::parse();
 
     let server = CustomServer::<Game>::open(
-        Path::new("minority-game.bonsaidb"),
-        Configuration {
-            server_name: String::from("minority-game.gooey.rs"),
-            default_permissions: DefaultPermissions::Permissions(Permissions::from(vec![
-                Statement {
-                    resources: vec![ResourceName::any()],
-                    actions: ActionNameList::List(vec![BonsaiAction::Server(
-                        ServerAction::Connect,
-                    )
-                    .name()]),
-                },
-            ])),
-            ..Configuration::default()
-        },
+        ServerConfiguration::new("minority-game.bonsaidb")
+            .server_name("minority-game.gooey.rs")
+            .default_permissions(Permissions::from(vec![Statement {
+                resources: vec![ResourceName::any()],
+                actions: ActionNameList::List(vec![
+                    BonsaiAction::Server(ServerAction::Connect).name()
+                ]),
+            }])),
     )
     .await?;
 
@@ -69,7 +63,7 @@ async fn main() -> anyhow::Result<()> {
                 cert_command,
                 bonsaidb::server::cli::certificate::Command::InstallSelfSigned { .. }
             );
-            cert_command.execute(server.clone()).await?;
+            cert_command.execute(&server).await?;
             if is_installing_self_signed {
                 if let Ok(chain) = server.certificate_chain().await {
                     tokio::fs::write(
@@ -100,9 +94,10 @@ async fn main() -> anyhow::Result<()> {
             }
 
             serve_command
-                .execute_with(server.clone(), WebServer::new(server).await)
+                .execute_with(&server, WebServer::new(server.clone()).await)
                 .await?
         }
+        Command::Storage(storage) => storage.execute_on(&server).await?,
     }
     Ok(())
 }
