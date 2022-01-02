@@ -92,9 +92,13 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bonsaidb::core::schema</span>::{
-    <span class="ident">Collection</span>, <span class="ident">CollectionDocument</span>, <span class="ident">CollectionName</span>, <span class="ident">CollectionView</span>, <span class="ident">InvalidNameError</span>, <span class="ident">MapResult</span>,
-    <span class="ident">Name</span>, <span class="ident">Schema</span>, <span class="ident">SchemaName</span>, <span class="ident">Schematic</span>,
+    <span class="ident">Collection</span>, <span class="ident">CollectionDocument</span>, <span class="ident">CollectionName</span>, <span class="ident">CollectionView</span>, <span class="ident">DefaultSerialization</span>,
+    <span class="ident">DefaultViewSerialization</span>, <span class="ident">InvalidNameError</span>, <span class="ident">MapResult</span>, <span class="ident">Name</span>, <span class="ident">Schema</span>, <span class="ident">SchemaName</span>, <span class="ident">Schematic</span>,
 };
 <span class="kw">use</span> <span class="ident">minority_game_shared::Choice</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -163,6 +167,8 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">DefaultSerialization</span> <span class="kw">for</span> <span class="ident">Player</span> {}
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PlayerByScore</span>;
 
@@ -186,6 +192,8 @@
         <span class="prelude-val">Ok</span>(<span class="ident">player</span>.<span class="ident">emit_key_and_value</span>(<span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">score</span>(), <span class="ident">player</span>.<span class="ident">contents</span>.<span class="ident">stats</span>.<span class="ident">clone</span>()))
     }
 }
+
+<span class="kw">impl</span> <span class="ident">DefaultViewSerialization</span> <span class="kw">for</span> <span class="ident">PlayerByScore</span> {}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="minority_game_server" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>

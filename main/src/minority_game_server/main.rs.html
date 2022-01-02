@@ -427,7 +427,7 @@
         <span class="ident">connection::StorageConnection</span>,
         <span class="ident">custom_api::Infallible</span>,
         <span class="ident">permissions::bonsai</span>::{<span class="ident">BonsaiAction</span>, <span class="ident">ServerAction</span>},
-        <span class="ident">schema</span>::{<span class="ident">Collection</span>, <span class="ident">CollectionDocument</span>},
+        <span class="ident">schema</span>::{<span class="ident">CollectionDocument</span>, <span class="ident">SerializedCollection</span>},
     },
     <span class="ident">local::config::Builder</span>,
     <span class="ident">server</span>::{
@@ -548,7 +548,7 @@
         );
 
         <span class="kw">let</span> <span class="ident">player</span> <span class="op">=</span> <span class="ident">Player::default</span>()
-            .<span class="ident">insert_into</span>(<span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>())
+            .<span class="ident">push_into</span>(<span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">game_database</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>())
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
         <span class="ident">client</span>.<span class="ident">set_client_data</span>(<span class="ident">player</span>).<span class="kw">await</span>;
