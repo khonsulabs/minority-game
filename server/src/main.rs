@@ -11,7 +11,7 @@ use bonsaidb::{
         connection::StorageConnection,
         custom_api::Infallible,
         permissions::bonsai::{BonsaiAction, ServerAction},
-        schema::{Collection, CollectionDocument},
+        schema::{CollectionDocument, SerializedCollection},
     },
     local::config::Builder,
     server::{
@@ -132,7 +132,7 @@ impl Backend for Game {
         );
 
         let player = Player::default()
-            .insert_into(&server.game_database().await.unwrap())
+            .push_into(&server.game_database().await.unwrap())
             .await
             .unwrap();
         client.set_client_data(player).await;

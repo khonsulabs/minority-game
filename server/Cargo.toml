@@ -16,7 +16,6 @@ bonsaidb = { git = "https://github.com/khonsulabs/bonsaidb", branch = "main", fe
     "server-websockets",
     "server-hyper",
     "server-cli",
-    "bincode",
 ] }
 tokio = { version = "1", features = ["full"] }
 anyhow = "1"

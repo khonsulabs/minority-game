@@ -1,6 +1,6 @@
 use bonsaidb::core::schema::{
-    Collection, CollectionDocument, CollectionName, CollectionView, InvalidNameError, MapResult,
-    Name, Schema, SchemaName, Schematic,
+    Collection, CollectionDocument, CollectionName, CollectionView, DefaultSerialization,
+    DefaultViewSerialization, InvalidNameError, MapResult, Name, Schema, SchemaName, Schematic,
 };
 use minority_game_shared::Choice;
 use serde::{Deserialize, Serialize};
@@ -69,6 +69,8 @@ impl Collection for Player {
     }
 }
 
+impl DefaultSerialization for Player {}
+
 #[derive(Debug)]
 pub struct PlayerByScore;
 
@@ -92,3 +94,5 @@ impl CollectionView for PlayerByScore {
         Ok(player.emit_key_and_value(player.contents.stats.score(), player.contents.stats.clone()))
     }
 }
+
+impl DefaultViewSerialization for PlayerByScore {}
