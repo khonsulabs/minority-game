@@ -1,21 +1,24 @@
 use devx_cmd::{run, Cmd};
-use khonsu_tools::{anyhow, code_coverage::CodeCoverage};
-use structopt::StructOpt;
+use khonsu_tools::universal::{
+    anyhow,
+    clap::{self, Parser},
+    code_coverage::CodeCoverage,
+};
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 enum Args {
     BuildWebApp {
-        #[structopt(long = "release")]
+        #[clap(long = "release")]
         release: bool,
     },
     GenerateCodeCoverageReport {
-        #[structopt(long = "install-dependencies")]
+        #[clap(long = "install-dependencies")]
         install_dependencies: bool,
     },
 }
 
 fn main() -> anyhow::Result<()> {
-    let args = Args::from_args();
+    let args = Args::parse();
     match args {
         Args::BuildWebApp { release } => build_web_app(release)?,
         Args::GenerateCodeCoverageReport {
@@ -68,4 +71,4 @@ fn execute_wasm_bindgen(wasm_path: &str, out_path: &str) -> Result<(), devx_cmd:
 
 struct CodeCoverageConfig;
 
-impl khonsu_tools::code_coverage::Config for CodeCoverageConfig {}
+impl khonsu_tools::universal::code_coverage::Config for CodeCoverageConfig {}

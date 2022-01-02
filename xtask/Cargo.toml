@@ -12,6 +12,5 @@ publish = false
 
 [dependencies]
 devx-cmd = "0.5"
-structopt = "0.3"
 khonsu-tools = { git = "https://github.com/khonsulabs/khonsu-tools.git", branch = "main" }
 fs_extra = "1"
