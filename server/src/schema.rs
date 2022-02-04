@@ -1,6 +1,9 @@
-use bonsaidb::core::schema::{
-    Collection, CollectionDocument, CollectionName, CollectionView, DefaultSerialization,
-    DefaultViewSerialization, InvalidNameError, MapResult, Name, Schema, SchemaName, Schematic,
+use bonsaidb::core::{
+    document::CollectionDocument,
+    schema::{
+        Collection, CollectionName, CollectionViewSchema, DefaultSerialization,
+        DefaultViewSerialization, Name, Schema, SchemaName, Schematic, View, ViewMapResult,
+    },
 };
 use minority_game_shared::Choice;
 use serde::{Deserialize, Serialize};
@@ -11,7 +14,7 @@ const AUTHORITY: &str = "minority-game";
 pub enum GameSchema {}
 
 impl Schema for GameSchema {
-    fn schema_name() -> Result<SchemaName, InvalidNameError> {
+    fn schema_name() -> SchemaName {
         SchemaName::new(AUTHORITY, "game")
     }
 
@@ -59,7 +62,7 @@ impl PlayerStats {
 }
 
 impl Collection for Player {
-    fn collection_name() -> Result<CollectionName, InvalidNameError> {
+    fn collection_name() -> CollectionName {
         CollectionName::new("minority-game", "player")
     }
 
@@ -71,27 +74,33 @@ impl Collection for Player {
 
 impl DefaultSerialization for Player {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayerByScore;
 
-impl CollectionView for PlayerByScore {
+impl View for PlayerByScore {
     type Collection = Player;
     type Key = u32;
     type Value = PlayerStats;
+
+    fn name(&self) -> Name {
+        Name::new("by-score")
+    }
+}
+
+impl CollectionViewSchema for PlayerByScore {
+    type View = Self;
 
     fn version(&self) -> u64 {
         2
     }
 
-    fn name(&self) -> Result<Name, InvalidNameError> {
-        Name::new("by-score")
-    }
-
     fn map(
         &self,
-        player: CollectionDocument<Self::Collection>,
-    ) -> MapResult<Self::Key, Self::Value> {
-        Ok(player.emit_key_and_value(player.contents.stats.score(), player.contents.stats.clone()))
+        player: CollectionDocument<<Self::View as View>::Collection>,
+    ) -> ViewMapResult<Self::View> {
+        Ok(player
+            .header
+            .emit_key_and_value(player.contents.stats.score(), player.contents.stats))
     }
 }
 

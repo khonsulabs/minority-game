@@ -4,14 +4,15 @@ use std::{
     time::Duration,
 };
 
-use actionable::{Action, ActionNameList, Permissions, ResourceName, Statement};
+use actionable::{Permissions, Statement};
 use bonsaidb::{
     core::{
         async_trait::async_trait,
         connection::StorageConnection,
         custom_api::Infallible,
+        document::CollectionDocument,
         permissions::bonsai::{BonsaiAction, ServerAction},
-        schema::{CollectionDocument, SerializedCollection},
+        schema::SerializedCollection,
     },
     local::config::Builder,
     server::{
@@ -48,12 +49,9 @@ async fn main() -> anyhow::Result<()> {
     let server = CustomServer::<Game>::open(
         ServerConfiguration::new("minority-game.bonsaidb")
             .server_name("minority-game.gooey.rs")
-            .default_permissions(Permissions::from(vec![Statement {
-                resources: vec![ResourceName::any()],
-                actions: ActionNameList::List(vec![
-                    BonsaiAction::Server(ServerAction::Connect).name()
-                ]),
-            }])),
+            .default_permissions(Permissions::from(
+                Statement::for_any().allowing(&BonsaiAction::Server(ServerAction::Connect)),
+            )),
     )
     .await?;
 

@@ -1,9 +1,6 @@
 use std::{borrow::Cow, sync::Arc};
 
-use axum::{
-    error_handling::HandleErrorExt, extract, http::HeaderValue, response::Html, routing::get,
-    AddExtensionLayer, Router,
-};
+use axum::{extract, http::HeaderValue, response::Html, routing::get, AddExtensionLayer, Router};
 use bonsaidb::{
     core::{async_trait::async_trait, connection::Connection},
     server::{CustomServer, HttpService, Peer},
@@ -75,8 +72,8 @@ impl WebServer {
         Router::new()
             .nest(
                 "/pkg",
-                axum::routing::service_method_routing::get(ServeDir::new(PKG_PATH)).handle_error(
-                    |err: std::io::Error| {
+                axum::routing::get_service(ServeDir::new(PKG_PATH)).handle_error(
+                    |err: std::io::Error| async move {
                         (
                             StatusCode::INTERNAL_SERVER_ERROR,
                             format!("unhandled internal error: {}", err),
@@ -86,13 +83,14 @@ impl WebServer {
             )
             .nest(
                 "/static",
-                axum::routing::service_method_routing::get(ServeDir::new(STATIC_PATH))
-                    .handle_error(|err: std::io::Error| {
+                axum::routing::get_service(ServeDir::new(STATIC_PATH)).handle_error(
+                    |err: std::io::Error| async move {
                         (
                             StatusCode::INTERNAL_SERVER_ERROR,
                             format!("unhandled internal error: {}", err),
                         )
-                    }),
+                    },
+                ),
             )
             .route("/ws", get(upgrade_websocket))
             .route("/game", axum::routing::get(spa_index))
@@ -102,7 +100,7 @@ impl WebServer {
             .layer(AddExtensionLayer::new(self.server.clone()))
             .layer(AddExtensionLayer::new(peer.clone()))
             .layer(AddExtensionLayer::new(self.templates.clone()))
-            .layer(SetResponseHeaderLayer::<_, Body>::if_not_present(
+            .layer(SetResponseHeaderLayer::if_not_present(
                 header::STRICT_TRANSPORT_SECURITY,
                 HeaderValue::from_static("max-age=31536000; preload"),
             ))
