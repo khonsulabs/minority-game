@@ -344,9 +344,9 @@ dependencies = [
 
 [[package]]
 name = "block-buffer"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1d36a02058e76b040de25a4464ba1c80935655595b661505c8b39b664828b95"
+checksum = "03588e54c62ae6d763e2a80090d50353b785795361b4ff5b3bf0a5097fc31c0b"
 dependencies = [
  "generic-array 0.14.5",
 ]
@@ -362,8 +362,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3141caf664d4a1357602c2cf824a61d25b3d1a73219f1b4318ecbe3eebfaadc4"
 dependencies = [
  "bonsaidb-client",
  "bonsaidb-core",
@@ -373,8 +374,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb-client"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9eaa4aa8046f674108bba4a5eaac6c818db0d8dee56d461c19c464a581d3a0b"
 dependencies = [
  "async-lock",
  "async-trait",
@@ -401,8 +403,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb-core"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "546beeb658b6eaf401087eb22fbe436ad6a1b0309f24383e35a72afc81b15024"
 dependencies = [
  "actionable",
  "arc-bytes",
@@ -425,8 +428,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb-local"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b0a742c5cce2c9b7b9d5f77295206e842abfb25d6eec8012755b4deb5ae31e7"
 dependencies = [
  "async-lock",
  "async-trait",
@@ -452,8 +456,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb-macros"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0dc1aafe48def5bc97bd5caf8f0cf137177301eae9618158782487369f034a14"
 dependencies = [
  "proc-macro-error",
  "quote",
@@ -462,8 +467,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb-server"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e404057a75378d0bcabda6b74e6a4f7346f5e554cdacf6df10b372d7ca2a8d4a"
 dependencies = [
  "async-acme",
  "async-lock",
@@ -498,8 +504,9 @@ dependencies = [
 
 [[package]]
 name = "bonsaidb-utils"
-version = "0.1.0-dev.4"
-source = "git+https://github.com/khonsulabs/bonsaidb?branch=release#c8698ae3097ae93c452a6246e9d8d8712d7a7144"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad98f8ccbd68578f36d2dab188c1d89314e2e9b32bbf79500e856b497b5d532e"
 
 [[package]]
 name = "bstr"
@@ -1145,7 +1152,7 @@ version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b697d66081d42af4fba142d56918a3cb21dc8eb63372c6b85d14f44fb9c5979b"
 dependencies = [
- "block-buffer 0.10.0",
+ "block-buffer 0.10.1",
  "crypto-common",
  "generic-array 0.14.5",
 ]
@@ -2182,7 +2189,7 @@ checksum = "078e285eafdfb6c4b434e0d31e8cfcb5115b651496faca5749b88fafd4f23bfd"
 [[package]]
 name = "khonsu-tools"
 version = "0.0.0"
-source = "git+https://github.com/khonsulabs/khonsu-tools.git?branch=main#bfdc9e1691db050946af014ef2aed3181e5563cc"
+source = "git+https://github.com/khonsulabs/khonsu-tools.git?branch=main#f6229f2e3e2a550efae9c8f143bd5d12245967c0"
 dependencies = [
  "anyhow",
  "badge",
@@ -2198,7 +2205,7 @@ dependencies = [
 [[package]]
 name = "khonsu-universal-tools"
 version = "0.0.0"
-source = "git+https://github.com/khonsulabs/khonsu-tools.git?branch=main#bfdc9e1691db050946af014ef2aed3181e5563cc"
+source = "git+https://github.com/khonsulabs/khonsu-tools.git?branch=main#f6229f2e3e2a550efae9c8f143bd5d12245967c0"
 dependencies = [
  "anyhow",
  "badge",
@@ -2897,9 +2904,9 @@ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "ordered-varint"
-version = "0.1.0-dev.1"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "619b760938788d8c87b84ef67aa4cf783476b47996a8b2fe4297740eb509011c"
+checksum = "5b0aecd1580577c0ecc89c57e7c8cf3cdc48d54a60f4339073c9d026ab1f1707"
 
 [[package]]
 name = "os_str_bytes"
@@ -3244,7 +3251,7 @@ dependencies = [
 [[package]]
 name = "png"
 version = "0.17.2"
-source = "git+https://github.com/image-rs/image-png.git#9d8c3b56b7432c939ba2bbfd4d0bdcecb3d6501c"
+source = "git+https://github.com/image-rs/image-png.git#4feb2959a8089041a8f30910ca3ae4d7272a57b7"
 dependencies = [
  "bitflags",
  "crc32fast",
@@ -3254,9 +3261,9 @@ dependencies = [
 
 [[package]]
 name = "pot"
-version = "1.0.0-rc.4"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "951305d697019d73889ee75bb74b76d7ee09a927a0a6fcaee1954533e7bf317b"
+checksum = "dbd269bc42e5b201bea16cd99453fbe70d26514e45b61e9f4ec0abda13d9da01"
 dependencies = [
  "byteorder",
  "bytes",
@@ -3654,9 +3661,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework"
-version = "2.6.0"
+version = "2.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fed7948b6c68acbb6e20c334f55ad635dc0f75506963de4464289fbd3b051ac"
+checksum = "2dc14f172faf8a0194a3aded622712b0de276821addc574fa54fc0a1167e10dc"
 dependencies = [
  "bitflags",
  "core-foundation 0.9.2",
@@ -3667,9 +3674,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework-sys"
-version = "2.6.0"
+version = "2.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a57321bf8bc2362081b2599912d2961fe899c0efadf1b4b2f8d48b3e253bb96c"
+checksum = "0160a13a177a45bfb43ce71c01580998474f556ad854dcbca936dd2841a5c556"
 dependencies = [
  "core-foundation-sys 0.8.3",
  "libc",
@@ -4305,15 +4312,15 @@ dependencies = [
 
 [[package]]
 name = "transmog"
-version = "0.1.0-dev.2"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94b82e27b883ae8c15d8afe4968f669e124927fe3661b320f612ec02c81c64bd"
+checksum = "d3a7f05cba0120a41e81c7309f084e8b1014118ed19857d6e878c79f0fc4efac"
 
 [[package]]
 name = "transmog-pot"
-version = "0.1.0-dev.2"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec664dab550be9aedf8ca35b677883f1391cf2647468f2b5b41d7d56b265da98"
+checksum = "be18a023411801d33a217c6b02316f5c71e373e8847dd521fc5a24710273ac48"
 dependencies = [
  "pot",
  "serde",

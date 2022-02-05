@@ -9,10 +9,7 @@ publish = false
 
 [dependencies]
 minority-game-shared = { path = "../shared" }
-bonsaidb = { git = "https://github.com/khonsulabs/bonsaidb", branch = "release", features = [
-    "client",
-    "client-websockets",
-] }
+bonsaidb = { version = "0.1.0", features = ["client", "client-websockets"] }
 log = "0.4.14"
 flume = "0.10.10"
 async-trait = "0.1.52"

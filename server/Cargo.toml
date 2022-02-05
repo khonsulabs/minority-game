@@ -11,7 +11,7 @@ acme = ["bonsaidb/server-acme"]
 
 [dependencies]
 minority-game-shared = { path = "../shared", features = ["actionable-traits"] }
-bonsaidb = { git = "https://github.com/khonsulabs/bonsaidb", branch = "release", features = [
+bonsaidb = { version = "0.1.0", features = [
     "server",
     "server-websockets",
     "server-hyper",
