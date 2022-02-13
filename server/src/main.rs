@@ -27,10 +27,7 @@ use minority_game_shared::{
 use rand::{thread_rng, Rng};
 use tokio::time::Instant;
 
-use crate::{
-    schema::{GameSchema, Player},
-    webserver::WebServer,
-};
+use crate::schema::{GameSchema, Player};
 
 mod schema;
 mod webserver;
@@ -73,26 +70,8 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Command::Serve(mut serve_command) => {
-            #[cfg(debug_assertions)]
-            if serve_command.http_port.is_none() {
-                use std::net::{Ipv6Addr, SocketAddr, SocketAddrV6};
-
-                serve_command.http_port = Some(SocketAddr::V6(SocketAddrV6::new(
-                    Ipv6Addr::UNSPECIFIED,
-                    8080,
-                    0,
-                    0,
-                )));
-                serve_command.https_port = Some(SocketAddr::V6(SocketAddrV6::new(
-                    Ipv6Addr::UNSPECIFIED,
-                    8081,
-                    0,
-                    0,
-                )));
-            }
-
-            serve_command
-                .execute_with(&server, WebServer::new(server.clone()).await)
+            server
+                .listen_for_websockets_on("0.0.0.0:8081", false)
                 .await?
         }
         Command::Storage(storage) => storage.execute_on(&server).await?,

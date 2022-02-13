@@ -219,7 +219,7 @@ async fn client() -> bonsaidb::client::Builder<()> {
         if #[cfg(target_arch = "wasm32")] {
             cfg_if!{
                 if #[cfg(debug_assertions)] {
-                    Client::build("ws://127.0.0.1:8080/ws".parse().unwrap())
+                    Client::build("ws://127.0.0.1:8081".parse().unwrap())
                 } else {
                     Client::build("wss://minority-game.gooey.rs/ws".parse().unwrap())
                 }
