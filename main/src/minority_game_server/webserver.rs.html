@@ -399,7 +399,7 @@
         } <span class="kw">else</span> {
             <span class="ident">Router::new</span>()
                 .<span class="ident">nest</span>(<span class="string">&quot;/&quot;</span>, <span class="ident">axum::routing::get</span>(<span class="ident">redirect_to_https</span>))
-                .<span class="ident">layer</span>(<span class="ident">AddExtensionLayer::new</span>(<span class="self">self</span>.<span class="ident">server</span>.<span class="ident">clone</span>()))
+                .<span class="ident">layer</span>(<span class="ident">Extension</span>(<span class="self">self</span>.<span class="ident">server</span>.<span class="ident">clone</span>()))
         }
     }
 }
