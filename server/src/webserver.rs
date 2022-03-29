@@ -1,8 +1,8 @@
 use std::{borrow::Cow, sync::Arc};
 
-use axum::{extract, http::HeaderValue, response::Html, routing::get, AddExtensionLayer, Router};
+use axum::{extract, extract::Extension, http::HeaderValue, response::Html, routing::get, Router};
 use bonsaidb::{
-    core::{async_trait::async_trait, connection::Connection},
+    core::{async_trait::async_trait, connection::AsyncConnection},
     server::{CustomServer, HttpService, Peer},
 };
 use cfg_if::cfg_if;
@@ -97,9 +97,9 @@ impl WebServer {
             .route("/stats", axum::routing::get(stats))
             .route("/", axum::routing::get(index))
             // Attach the server and the remote address as extractable data for the /ws route
-            .layer(AddExtensionLayer::new(self.server.clone()))
-            .layer(AddExtensionLayer::new(peer.clone()))
-            .layer(AddExtensionLayer::new(self.templates.clone()))
+            .layer(Extension(self.server.clone()))
+            .layer(Extension(peer.clone()))
+            .layer(Extension(self.templates.clone()))
             .layer(SetResponseHeaderLayer::if_not_present(
                 header::STRICT_TRANSPORT_SECURITY,
                 HeaderValue::from_static("max-age=31536000; preload"),
@@ -225,14 +225,22 @@ async fn stats(
                     .iter()
                     .enumerate()
                     .map(|(index, player)| {
-                        RankedPlayer::from_player_stats(&player.contents.stats, player.id, index)
+                        RankedPlayer::from_player_stats(
+                            &player.contents.stats,
+                            player.header.id,
+                            index,
+                        )
                     })
                     .collect(),
                 top_players: top_players
                     .into_iter()
                     .enumerate()
                     .map(|(index, map)| {
-                        RankedPlayer::from_player_stats(&map.value, map.source.id, index)
+                        RankedPlayer::from_player_stats(
+                            &map.value,
+                            map.source.id.deserialize().unwrap(),
+                            index,
+                        )
                     })
                     .collect(),
             })

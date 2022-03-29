@@ -1,6 +1,4 @@
-use std::time::Duration;
-
-use bonsaidb::client::Client;
+use bonsaidb::client::{ApiCallback, Client};
 use cfg_if::cfg_if;
 use gooey::{
     core::{figures::Size, Context, StyledWidget, WindowBuilder},
@@ -12,7 +10,9 @@ use gooey::{
     },
     App,
 };
-use minority_game_shared::{whole_percent, Api, Choice, Request, Response};
+use minority_game_shared::{
+    whole_percent, Choice, ChoiceSet, RoundComplete, RoundPending, SetChoice, SetTell, Welcome,
+};
 
 fn main() {
     // The user interface and database will be run separately, and flume
@@ -132,7 +132,7 @@ impl Behavior for GameInterface {
             )
             .with(
                 GameWidgets::Status,
-                Label::new("Connecting..."),
+                Label::new("Ready to play."),
                 WidgetLayout::build()
                     .bottom(Dimension::exact(20.))
                     .left(Dimension::exact(20.))
@@ -214,7 +214,7 @@ struct DatabaseContext {
     context: Context<Component<GameInterface>>,
 }
 
-async fn client() -> bonsaidb::client::Builder<()> {
+async fn client() -> bonsaidb::client::Builder {
     cfg_if! {
         if #[cfg(target_arch = "wasm32")] {
             cfg_if!{
@@ -248,78 +248,72 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
 
     // Connect to the locally running server. `cargo run --package server`
     // launches the server.
-    let client = loop {
-        let api_callback_context = database.clone();
-        match client().await
-            .with_custom_api_callback::<Api, _>(move |response| match response {
-                Ok(Response::Welcome {
-                    happiness,
-                    player_id
-                }) => {
-                    let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
-                        format!("Welcome {}! Current happiness: {}",
-                            player_id,
-                            whole_percent(happiness),
-                        )
-                    )));
-                }
-                Ok(Response::ChoiceSet(_)) => unreachable!(),
-                Ok(Response::RoundComplete {
+
+    let client = client()
+        .await
+        .with_api_callback::<Welcome>(ApiCallback::new_with_context(
+            database.clone(),
+            |welcome: Welcome, database| async move {
+                let _ = database.context.send_command(ComponentCommand::Behavior(
+                    GameInterfaceEvent::UpdateStatus(format!(
+                        "Welcome {}! Current happiness: {}",
+                        welcome.player_id,
+                        whole_percent(welcome.happiness),
+                    )),
+                ));
+            },
+        ))
+        .with_api_callback::<RoundComplete>(ApiCallback::new_with_context(
+            database.clone(),
+            |api: RoundComplete, database| async move {
+                let RoundComplete {
                     won,
                     happiness,
                     current_rank,
                     number_of_players,
                     number_of_liars,
-                    number_of_tells
-                }) => {
-                    let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
-                        format!("You {}! {}/{} players lied about their intentions. Current happiness: {}%. Ranked {} of {} players in the last round.",
-                            if won {
-                                "won"
-                            } else {
-                                "lost"
-                            },
-                            number_of_liars,
-                            number_of_tells,
-                            whole_percent(happiness),
-                            current_rank,
-                            number_of_players
-                        )
-                    )));
-                }
-                Ok(Response::RoundPending {
+                    number_of_tells,
+                } = api;
+                let _ = database.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
+                    format!("You {}! {}/{} players lied about their intentions. Current happiness: {}%. Ranked {} of {} players in the last round.",
+                        if won {
+                            "won"
+                        } else {
+                            "lost"
+                        },
+                        number_of_liars,
+                        number_of_tells,
+                        whole_percent(happiness),
+                        current_rank,
+                        number_of_players
+                    )
+                )));
+            },
+        ))
+        .with_api_callback::<RoundPending>(ApiCallback::new_with_context(
+            database.clone(),
+            |api: RoundPending, database| async move {
+                let RoundPending {
                     current_rank,
                     number_of_players,
                     seconds_remaining,
                     number_of_tells,
                     tells_going_out,
-                }) => {
-                    let _ = api_callback_context.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
-                        format!("Round starting in {} seconds! Ranked {} of {}. Current tells: {}/{} ({}%) going out.",
-                            seconds_remaining,
-                            current_rank,
-                            number_of_players,
-                            tells_going_out,
-                            number_of_tells,
-                            whole_percent(tells_going_out as f32 / number_of_tells as f32)
-                        )
-                    )));
-                }
-
-                Err(err) => {
-                    log::error!("Error from API: {:?}", err);
-                }
-            })
-            .finish()
-            .await
-        {
-            Ok(client) => break client,
-            Err(err) => {
-                log::error!("Error connecting: {:?}", err);
-                App::sleep_for(Duration::from_secs(1)).await;
-            }
-        }
-    };
+                } = api;
+                let _ = database.context.send_command(ComponentCommand::Behavior(GameInterfaceEvent::UpdateStatus(
+                    format!("Round starting in {} seconds! Ranked {} of {}. Current tells: {}/{} ({}%) going out.",
+                        seconds_remaining,
+                        current_rank,
+                        number_of_players,
+                        tells_going_out,
+                        number_of_tells,
+                        whole_percent(tells_going_out as f32 / number_of_tells as f32)
+                    )
+                )));
+            },
+        ))
+        .finish()
+        .expect("invalid configuration");
 
     // For each `DatabaseCommand`. The only error possible from recv_async() is
     // a disconnected error, which should only happen when the app is shutting
@@ -327,8 +321,8 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
     while let Ok(command) = receiver.recv_async().await {
         match command {
             DatabaseCommand::SetChoice(choice) => {
-                match client.send_api_request(Request::SetChoice(choice)).await {
-                    Ok(Response::ChoiceSet(choice)) => {
+                match client.send_api_request_async(&SetChoice(choice)).await {
+                    Ok(ChoiceSet(choice)) => {
                         log::info!("Choice confirmed: {:?}", choice)
                     }
                     other => {
@@ -337,8 +331,8 @@ async fn process_database_commands(receiver: flume::Receiver<DatabaseCommand>) {
                 }
             }
             DatabaseCommand::SetTell(choice) => {
-                match client.send_api_request(Request::SetTell(choice)).await {
-                    Ok(Response::ChoiceSet(choice)) => {
+                match client.send_api_request_async(&SetTell(choice)).await {
+                    Ok(ChoiceSet(choice)) => {
                         log::info!("Tell confirmed: {:?}", choice)
                     }
                     other => {

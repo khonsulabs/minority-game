@@ -2,5 +2,6 @@
 resolver = "2"
 members = ["client", "server", "shared", "xtask"]
 
-# [patch."https://github.com/khonsulabs/bonsaidb"]
+[patch.crates-io]
 # bonsaidb = { path = "../bonsaidb/crates/bonsaidb" }
+bonsaidb = { git = "https://github.com/khonsulabs/bonsaidb.git", branch = "release" }

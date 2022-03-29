@@ -11,7 +11,7 @@ acme = ["bonsaidb/server-acme"]
 
 [dependencies]
 minority-game-shared = { path = "../shared", features = ["actionable-traits"] }
-bonsaidb = { version = "0.1.0", features = [
+bonsaidb = { version = "0.4.0", features = [
     "server",
     "server-websockets",
     "server-hyper",
@@ -19,7 +19,7 @@ bonsaidb = { version = "0.1.0", features = [
 ] }
 tokio = { version = "1.16.1", features = ["full"] }
 anyhow = "1.0.53"
-actionable = "0.1.0"
+actionable = "0.2.0"
 serde = { version = "1.0.136", features = ["derive"] }
 log = "0.4.14"
 approx = "0.5.1"

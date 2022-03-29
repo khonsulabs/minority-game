@@ -7,22 +7,24 @@ use std::{
 use actionable::{Permissions, Statement};
 use bonsaidb::{
     core::{
+        api::Infallible,
         async_trait::async_trait,
-        connection::StorageConnection,
-        custom_api::Infallible,
+        connection::AsyncStorageConnection,
         document::CollectionDocument,
         permissions::bonsai::{BonsaiAction, ServerAction},
         schema::SerializedCollection,
     },
-    local::config::Builder,
+    local::{config::Builder, StorageNonBlocking},
     server::{
-        cli::Command, Backend, BackendError, ConnectedClient, ConnectionHandling,
-        CustomApiDispatcher, CustomServer, ServerConfiguration, ServerDatabase,
+        api::{Handler, HandlerError, HandlerSession},
+        cli::Command,
+        Backend, BackendError, ConnectedClient, ConnectionHandling, CustomServer,
+        ServerConfiguration, ServerDatabase,
     },
 };
 use clap::Parser;
 use minority_game_shared::{
-    Api, Choice, Request, RequestDispatcher, Response, SetChoiceHandler, SetTellHandler,
+    Choice, ChoiceSet, RoundComplete, RoundPending, SetChoice, SetTell, Welcome,
 };
 use rand::{thread_rng, Rng};
 use tokio::time::Instant;
@@ -95,7 +97,7 @@ async fn main() -> anyhow::Result<()> {
                 .execute_with(&server, WebServer::new(server.clone()).await)
                 .await?
         }
-        Command::Storage(storage) => storage.execute_on(&server).await?,
+        Command::Storage(storage) => storage.execute_on_async(&server).await?,
     }
     Ok(())
 }
@@ -105,24 +107,31 @@ enum Game {}
 
 #[async_trait]
 impl Backend for Game {
+    type Error = Infallible;
     type ClientData = CollectionDocument<Player>;
-    type CustomApi = Api;
-    type CustomApiDispatcher = ApiDispatcher;
 
-    async fn initialize(server: &CustomServer<Self>) {
-        server.register_schema::<GameSchema>().await.unwrap();
+    fn configure(
+        config: ServerConfiguration<Self>,
+    ) -> Result<ServerConfiguration<Self>, BackendError<Infallible>> {
+        Ok(config
+            .with_schema::<GameSchema>()?
+            .with_api::<ApiHandler, SetChoice>()?
+            .with_api::<ApiHandler, SetTell>()?)
+    }
+
+    async fn initialize(server: &CustomServer<Self>) -> Result<(), BackendError<Infallible>> {
         server
             .create_database::<GameSchema>(DATABASE_NAME, true)
-            .await
-            .unwrap();
+            .await?;
 
         tokio::spawn(game_loop(server.clone()));
+        Ok(())
     }
 
     async fn client_connected(
         client: &ConnectedClient<Self>,
         server: &CustomServer<Self>,
-    ) -> ConnectionHandling {
+    ) -> Result<ConnectionHandling, BackendError<Infallible>> {
         log::info!(
             "{:?} client connected from {:?}",
             client.transport(),
@@ -130,75 +139,65 @@ impl Backend for Game {
         );
 
         let player = Player::default()
-            .push_into(&server.game_database().await.unwrap())
-            .await
-            .unwrap();
+            .push_into_async(&server.game_database().await?)
+            .await?;
+
+        drop(client.send::<Welcome>(
+            None,
+            &Welcome {
+                player_id: player.header.id,
+                happiness: player.contents.stats.happiness,
+            },
+        ));
+
         client.set_client_data(player).await;
 
-        ConnectionHandling::Accept
+        Ok(ConnectionHandling::Accept)
     }
 }
 
-impl CustomApiDispatcher<Game> for ApiDispatcher {
-    fn new(server: &CustomServer<Game>, client: &ConnectedClient<Game>) -> Self {
-        ApiDispatcher {
-            server: server.clone(),
-            client: client.clone(),
-        }
-    }
-}
-
-#[derive(Debug, actionable::Dispatcher)]
-#[dispatcher(input = Request)]
-struct ApiDispatcher {
-    server: CustomServer<Game>,
-    client: ConnectedClient<Game>,
-}
-
-impl RequestDispatcher for ApiDispatcher {
-    type Error = BackendError<Infallible>;
-    type Output = Response;
-}
+#[derive(Debug)]
+enum ApiHandler {}
 
 #[actionable::async_trait]
-impl SetChoiceHandler for ApiDispatcher {
+impl Handler<Game, SetChoice> for ApiHandler {
     async fn handle(
-        &self,
-        _permissions: &actionable::Permissions,
-        choice: Choice,
-    ) -> Result<Response, BackendError<Infallible>> {
-        let db = self.server.game_database().await?;
+        session: HandlerSession<'_, Game>,
+        api: SetChoice,
+    ) -> Result<ChoiceSet, HandlerError<Infallible>> {
+        let SetChoice(choice) = api;
+        let db = session.server.game_database().await?;
 
-        let mut player = self.client.client_data().await;
+        let mut player = session.client.client_data().await;
         let player = player
             .as_mut()
             .expect("all connected clients should have a player record");
 
         player.contents.choice = Some(choice);
-        player.update(&db).await?;
+        player.update_async(&db).await?;
 
-        Ok(Response::ChoiceSet(choice))
+        Ok(ChoiceSet(choice))
     }
 }
 
 #[actionable::async_trait]
-impl SetTellHandler for ApiDispatcher {
+impl Handler<Game, SetTell> for ApiHandler {
     async fn handle(
-        &self,
-        _permissions: &actionable::Permissions,
-        tell: Choice,
-    ) -> Result<Response, BackendError<Infallible>> {
-        let db = self.server.game_database().await?;
+        session: HandlerSession<'_, Game>,
+        api: SetTell,
+    ) -> Result<ChoiceSet, HandlerError<Infallible>> {
+        let SetTell(tell) = api;
+        let db = session.server.game_database().await?;
 
-        let mut player = self.client.client_data().await;
+        let mut player = session.client.client_data().await;
         let player = player
             .as_mut()
             .expect("all connected clients should have a player record");
 
         player.contents.tell = Some(tell);
-        player.update(&db).await?;
+        player.update_async(&db).await?;
 
-        Ok(Response::ChoiceSet(tell))
+        Ok(ChoiceSet(tell))
     }
 }
 
@@ -263,14 +262,17 @@ async fn send_status_update(
     let seconds_remaining = seconds_remaining.unwrap_or(SECONDS_PER_ROUND);
 
     for (index, player) in players.iter().enumerate() {
-        let client = &clients_by_player_id[&player.id];
-        drop(client.send(Ok(Response::RoundPending {
-            seconds_remaining,
-            number_of_players: players.len() as u32,
-            current_rank: index as u32 + 1,
-            tells_going_out,
-            number_of_tells,
-        })));
+        let client = &clients_by_player_id[&player.header.id];
+        drop(client.send::<RoundPending>(
+            None,
+            &RoundPending {
+                seconds_remaining,
+                number_of_players: players.len() as u32,
+                current_rank: index as u32 + 1,
+                tells_going_out,
+                number_of_tells,
+            },
+        ));
     }
 
     Ok(GameState::Pending { seconds_remaining })
@@ -291,7 +293,7 @@ async fn play_game(
     for player in &players {
         match player.contents.choice.unwrap() {
             Choice::GoOut => {
-                going_out_player_ids.insert(player.id);
+                going_out_player_ids.insert(player.header.id);
                 going_out += 1;
             }
             Choice::StayIn => {
@@ -343,27 +345,30 @@ async fn play_game(
         }
 
         player.contents.tell = None;
-        player.update(db).await?;
+        player.update_async(db).await?;
     }
 
     sort_players(&mut players);
 
     let number_of_players = players.len() as u32;
     for (index, player) in players.into_iter().enumerate() {
-        let client = &clients_by_player_id[&player.id];
-        let won = if going_out_player_ids.contains(&player.id) {
+        let client = &clients_by_player_id[&player.header.id];
+        let won = if going_out_player_ids.contains(&player.header.id) {
             had_fun
         } else {
             player.contents.stats.happiness < 0.5
         };
-        drop(client.send(Ok(Response::RoundComplete {
-            won,
-            happiness: player.contents.stats.happiness,
-            current_rank: index as u32 + 1,
-            number_of_players,
-            number_of_tells,
-            number_of_liars,
-        })));
+        drop(client.send::<RoundComplete>(
+            None,
+            &RoundComplete {
+                won,
+                happiness: player.contents.stats.happiness,
+                current_rank: index as u32 + 1,
+                number_of_players,
+                number_of_tells,
+                number_of_liars,
+            },
+        ));
         client.set_client_data(player).await;
     }
 
@@ -390,7 +395,7 @@ async fn collect_players(
     for client in clients {
         let mut player = client.client_data().await;
         if let Some(player) = player.as_mut() {
-            clients_by_player_id.insert(player.id, client.clone());
+            clients_by_player_id.insert(player.header.id, client.clone());
             if player.contents.choice.is_some() {
                 players.push(player.clone());
             }

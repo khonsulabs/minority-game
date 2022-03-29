@@ -1,31 +1,16 @@
 use bonsaidb::core::{
-    document::CollectionDocument,
-    schema::{
-        Collection, CollectionName, CollectionViewSchema, DefaultSerialization,
-        DefaultViewSerialization, Name, Schema, SchemaName, Schematic, View, ViewMapResult,
-    },
+    document::{CollectionDocument, Emit},
+    schema::{Collection, CollectionViewSchema, Schema, View, ViewMapResult},
 };
 use minority_game_shared::Choice;
 use serde::{Deserialize, Serialize};
 
-const AUTHORITY: &str = "minority-game";
-
-#[derive(Debug)]
+#[derive(Schema, Debug)]
+#[schema(authority = "minority-game", name = "game", collections = [Player])]
 pub enum GameSchema {}
 
-impl Schema for GameSchema {
-    fn schema_name() -> SchemaName {
-        SchemaName::new(AUTHORITY, "game")
-    }
-
-    fn define_collections(schema: &mut Schematic) -> Result<(), bonsaidb::core::Error> {
-        schema.define_collection::<Player>()?;
-
-        Ok(())
-    }
-}
-
-#[derive(Default, Debug, Serialize, Deserialize, Clone)]
+#[derive(Collection, Default, Debug, Serialize, Deserialize, Clone)]
+#[collection(authority = "minority-game", name = "player", views = [PlayerByScore])]
 pub struct Player {
     pub choice: Option<Choice>,
     #[serde(default)]
@@ -61,31 +46,9 @@ impl PlayerStats {
     }
 }
 
-impl Collection for Player {
-    fn collection_name() -> CollectionName {
-        CollectionName::new("minority-game", "player")
-    }
-
-    fn define_views(schema: &mut Schematic) -> Result<(), bonsaidb::core::Error> {
-        schema.define_view(PlayerByScore)?;
-        Ok(())
-    }
-}
-
-impl DefaultSerialization for Player {}
-
-#[derive(Debug, Clone)]
+#[derive(View, Debug, Clone)]
+#[view(collection = Player, name = "by-score", key = u32, value = PlayerStats)]
 pub struct PlayerByScore;
-
-impl View for PlayerByScore {
-    type Collection = Player;
-    type Key = u32;
-    type Value = PlayerStats;
-
-    fn name(&self) -> Name {
-        Name::new("by-score")
-    }
-}
 
 impl CollectionViewSchema for PlayerByScore {
     type View = Self;
@@ -98,10 +61,8 @@ impl CollectionViewSchema for PlayerByScore {
         &self,
         player: CollectionDocument<<Self::View as View>::Collection>,
     ) -> ViewMapResult<Self::View> {
-        Ok(player
+        player
             .header
-            .emit_key_and_value(player.contents.stats.score(), player.contents.stats))
+            .emit_key_and_value(player.contents.stats.score(), player.contents.stats)
     }
 }
-
-impl DefaultViewSerialization for PlayerByScore {}

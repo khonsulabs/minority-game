@@ -1,17 +1,40 @@
-use bonsaidb::core::custom_api::{CustomApi, Infallible};
+use bonsaidb::core::{
+    api::{Api, Infallible},
+    schema::{ApiName, Qualified},
+};
 use serde::{Deserialize, Serialize};
 
-/// A game network request.
+/// Set the current choice.
 #[derive(Serialize, Deserialize, Debug)]
-#[cfg_attr(feature = "actionable-traits", derive(actionable::Actionable))]
-pub enum Request {
-    /// Set the current choice.
-    #[cfg_attr(feature = "actionable-traits", actionable(protection = "none"))]
-    SetChoice(Choice),
-    /// Set the current tell.
-    #[cfg_attr(feature = "actionable-traits", actionable(protection = "none"))]
-    SetTell(Choice),
+pub struct SetChoice(pub Choice);
+
+impl Api for SetChoice {
+    type Response = ChoiceSet;
+
+    type Error = Infallible;
+
+    fn name() -> ApiName {
+        ApiName::private("set-choice")
+    }
 }
+
+/// Set the current tell.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SetTell(pub Choice);
+
+impl Api for SetTell {
+    type Response = ChoiceSet;
+
+    type Error = Infallible;
+
+    fn name() -> ApiName {
+        ApiName::private("set-tell")
+    }
+}
+
+/// Our choice has been set.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ChoiceSet(pub Choice);
 
 /// A player's choice in the game.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -20,44 +43,63 @@ pub enum Choice {
     StayIn,
 }
 
-/// A game network response.
+/// The server has set up our player record.
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub enum Response {
-    /// The server has set up our player record.
-    Welcome { player_id: u64, happiness: f32 },
-
-    /// Our choice has been set.
-    ChoiceSet(Choice),
-
-    /// A round is pending.
-    RoundPending {
-        seconds_remaining: u32,
-        number_of_players: u32,
-        current_rank: u32,
-        number_of_tells: u32,
-        tells_going_out: u32,
-    },
-
-    /// A round has finished.
-    RoundComplete {
-        /// The player's happiness has gone up this round.
-        won: bool,
-        happiness: f32,
-        current_rank: u32,
-        number_of_players: u32,
-        number_of_liars: u32,
-        number_of_tells: u32,
-    },
+pub struct Welcome {
+    pub player_id: u64,
+    pub happiness: f32,
 }
 
-/// The [`CustomApi`] for the game.
-#[derive(Debug)]
-pub enum Api {}
+impl Api for Welcome {
+    type Response = Self;
 
-impl CustomApi for Api {
     type Error = Infallible;
-    type Request = Request;
-    type Response = Response;
+
+    fn name() -> ApiName {
+        ApiName::private("welcome")
+    }
+}
+
+/// A round is pending.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RoundPending {
+    pub seconds_remaining: u32,
+    pub number_of_players: u32,
+    pub current_rank: u32,
+    pub number_of_tells: u32,
+    pub tells_going_out: u32,
+}
+
+impl Api for RoundPending {
+    type Response = Self;
+
+    type Error = Infallible;
+
+    fn name() -> ApiName {
+        ApiName::private("round-pending")
+    }
+}
+
+/// A round has finished.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RoundComplete {
+    /// The player's happiness has gone up this round.
+    pub won: bool,
+    pub happiness: f32,
+    pub current_rank: u32,
+    pub number_of_players: u32,
+    pub number_of_liars: u32,
+    pub number_of_tells: u32,
+}
+
+impl Api for RoundComplete {
+    type Response = Self;
+
+    type Error = Infallible;
+
+    fn name() -> ApiName {
+        ApiName::private("round-complete")
+    }
 }
 
 /// Converts a `percent` to its nearest whole number.
