@@ -118,7 +118,7 @@ impl WebServer {
         } else {
             Router::new()
                 .nest("/", axum::routing::get(redirect_to_https))
-                .layer(AddExtensionLayer::new(self.server.clone()))
+                .layer(Extension(self.server.clone()))
         }
     }
 }
