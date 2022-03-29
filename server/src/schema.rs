@@ -23,7 +23,9 @@ pub struct PlayerStats {
     pub happiness: f32,
     pub times_went_out: u32,
     pub times_stayed_in: u32,
+    #[serde(default)]
     pub times_lied: u32,
+    #[serde(default)]
     pub times_told_truth: u32,
 }
 
