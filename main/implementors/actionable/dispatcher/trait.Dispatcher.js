@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["minority_game_server"] = [{"text":"impl Dispatcher&lt;<a class=\"enum\" href=\"minority_game_shared/enum.Request.html\" title=\"enum minority_game_shared::Request\">Request</a>&gt; for <a class=\"struct\" href=\"minority_game_server/struct.ApiDispatcher.html\" title=\"struct minority_game_server::ApiDispatcher\">ApiDispatcher</a>","synthetic":false,"types":["minority_game_server::ApiDispatcher"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

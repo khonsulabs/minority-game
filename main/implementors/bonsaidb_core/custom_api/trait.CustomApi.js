@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["minority_game_shared"] = [{"text":"impl CustomApi for <a class=\"enum\" href=\"minority_game_shared/enum.Api.html\" title=\"enum minority_game_shared::Api\">Api</a>","synthetic":false,"types":["minority_game_shared::Api"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
